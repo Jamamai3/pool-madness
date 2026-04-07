@@ -730,14 +730,126 @@ function renderAdmin(){
   ).join('')||'<div class="empty">Aucune transaction</div>';
 }
 
-function loadMatches(){
+// NHL TEAM CODE MAP
+const NHL_TEAMS={
+  'ANA':'Ducks','ARI':'Coyotes','BOS':'Bruins','BUF':'Sabres','CGY':'Flames',
+  'CAR':'Hurricanes','CHI':'Blackhawks','COL':'Avalanche','CBJ':'Blue Jackets',
+  'DAL':'Stars','DET':'Red Wings','EDM':'Oilers','FLA':'Panthers','LAK':'Kings',
+  'MIN':'Wild','MTL':'Canadiens','NSH':'Predators','NJD':'Devils','NYI':'Islanders',
+  'NYR':'Rangers','OTT':'Senators','PHI':'Flyers','PIT':'Penguins','SEA':'Kraken',
+  'SJS':'Sharks','STL':'Blues','TBL':'Lightning','TOR':'Maple Leafs','VAN':'Canucks',
+  'VGK':'Golden Knights','WSH':'Capitals','WPG':'Jets','UTA':'Hockey Club'
+};
+
+let nhlGamesCache=[], nhlStatsCache={}, lastNhlFetch=0;
+
+async function loadMatches(){
   document.getElementById('mdate').textContent=new Date().toLocaleDateString('fr-CA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('mgrid').innerHTML=MATCHES.map(m=>{
-    const live=!['Final','19h00','20h00'].includes(m.st);
-    const cls=m.st==='Final'?'final':m.st.includes('h')?'soon':'live';
-    return `<div class="mcard"><div class="mteams"><span>${m.away}</span><span class="mscore">${m.as}–${m.hs}</span><span>${m.home}</span></div><div class="mstatus ${cls}">${live?'● ':''}${m.st}</div></div>`;
-  }).join('');
+  document.getElementById('mgrid').innerHTML='<div class="empty"><div class="spin"></div> Chargement des matchs LNH...</div>';
+  try {
+    const today=new Date().toISOString().split('T')[0];
+    const proxy='https://api.allorigins.win/get?url=';
+    const r=await fetch(proxy+encodeURIComponent('https://api-web.nhle.com/v1/score/'+today));
+    if(!r.ok) throw new Error('API non disponible');
+    const raw=await r.json();
+    const d=JSON.parse(raw.contents);
+    const games=d.games||[];
+    nhlGamesCache=games;
+    if(!games.length){
+      document.getElementById('mgrid').innerHTML='<div class="empty">Aucun match aujourd\'hui</div>';
+      return;
+    }
+    document.getElementById('mgrid').innerHTML=games.map(g=>{
+      const away=g.awayTeam?.abbrev||'?';
+      const home=g.homeTeam?.abbrev||'?';
+      const awayScore=g.awayTeam?.score??'—';
+      const homeScore=g.homeTeam?.score??'—';
+      const state=g.gameState||'';
+      let status='', cls='soon';
+      if(state==='OFF'||state==='FINAL'){status='Final';cls='final';}
+      else if(state==='LIVE'||state==='CRIT'){
+        const p=g.periodDescriptor?.number||1;
+        const pName=p===1?'1re':p===2?'2e':p===3?'3e':'Pr.';
+        const clock=g.clock?.timeRemaining||'';
+        status='● '+pName+' — '+clock;cls='live';
+      }
+      else if(state==='PRE'||state==='FUT'){
+        const t=g.startTimeUTC?new Date(g.startTimeUTC).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit',timeZone:'America/Toronto'}):'—';
+        status=t;cls='soon';
+      }
+      else{status=state;cls='soon';}
+      const scoreStr=(state==='PRE'||state==='FUT')?'–':`${awayScore}–${homeScore}`;
+      return `<div class="mcard" onclick="fetchGameStats('${g.id}')">
+        <div class="mteams"><span>${away}</span><span class="mscore">${scoreStr}</span><span>${home}</span></div>
+        <div class="mstatus ${cls}">${status}</div>
+      </div>`;
+    }).join('');
+    // Auto-fetch stats for active/finished games
+    const activeGames=games.filter(g=>g.gameState==='OFF'||g.gameState==='FINAL'||g.gameState==='LIVE'||g.gameState==='CRIT');
+    if(activeGames.length) await fetchAllStats(activeGames.map(g=>g.id));
+  } catch(e) {
+    // Fallback to demo data
+    document.getElementById('mgrid').innerHTML=MATCHES.map(m=>{
+      const live=!['Final','19h00','20h00'].includes(m.st);
+      const cls=m.st==='Final'?'final':m.st.includes('h')?'soon':'live';
+      return `<div class="mcard"><div class="mteams"><span>${m.away}</span><span class="mscore">${m.as}–${m.hs}</span><span>${m.home}</span></div><div class="mstatus ${cls}">${live?'● ':''}${m.st}</div></div>`;
+    }).join('');
+  }
 }
+
+async function fetchAllStats(gameIds){
+  for(const id of gameIds){
+    try{
+      const proxy='https://api.allorigins.win/get?url=';
+      const r=await fetch(proxy+encodeURIComponent('https://api-web.nhle.com/v1/gamecenter/'+id+'/boxscore'));
+      if(!r.ok) continue;
+      const raw=await r.json();
+      const d=JSON.parse(raw.contents);
+      // Extract player stats from both teams
+      const teams=[d.playerByGameStats?.homeTeam, d.playerByGameStats?.awayTeam].filter(Boolean);
+      teams.forEach(team=>{
+        ['forwards','defense','goalies'].forEach(pos=>{
+          (team[pos]||[]).forEach(p=>{
+            const name=(p.name?.default||'').trim();
+            if(!name) return;
+            if(!nhlStatsCache[name]) nhlStatsCache[name]={goals:0,assists:0,wins:0,shutouts:0};
+            if(pos==='goalies'){
+              const won=p.decision==='W';
+              const so=(p.shotsAgainst||0)>0&&(p.goalsAgainst||0)===0&&won;
+              nhlStatsCache[name].wins+=(won?1:0);
+              nhlStatsCache[name].shutouts+=(so?1:0);
+            } else {
+              nhlStatsCache[name].goals+=(p.goals||0);
+              nhlStatsCache[name].assists+=(p.assists||0);
+            }
+          });
+        });
+      });
+    }catch(e2){}
+  }
+  // Update todayPts for active roster
+  let totalToday=0;
+  ra.forEach(p=>{
+    const stats=nhlStatsCache[p.name];
+    if(stats && p.status==='active'){
+      if(p.pos==='G'){
+        p.todayPts=(stats.wins||0)+(stats.shutouts?2:0); // 1 win + 2 bonus for SO = 3 total
+      } else {
+        p.todayPts=(stats.goals||0)+(stats.assists||0);
+      }
+      totalToday+=p.todayPts;
+    }
+  });
+  renderRoster();
+  // Update today stat card
+  document.getElementById('s2').textContent='+'+totalToday;
+  notify('Stats LNH mises à jour — '+Object.keys(nhlStatsCache).length+' joueurs chargés');
+}
+
+window.fetchGameStats=async function(gameId){
+  notify('Chargement du match...');
+  await fetchAllStats([gameId]);
+};
 
 function showApp(){
   document.getElementById('lov').classList.add('hidden');
