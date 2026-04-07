@@ -882,7 +882,7 @@ function renderTradeDGSelector(){
   const others=dgs.filter(d=>currentUser&&d.id!==currentUser.uid);
   document.getElementById('tradeDgSelector').innerHTML=others.length?others.map(d=>`
     <button class="dg-sel-btn ${selectedTradeDG===d.id?'active':''}" onclick="selectTradeDG('${d.id}')">${d.name||d.email||'DG'}</button>
-  `).join(''):'<span style="color:var(--text3);font-size:13px;">Aucun autre DG enregistré pour l'instant</span>';
+  `).join(''):'<span style="color:var(--text3);font-size:13px;">Aucun autre DG enregistré pour l\'instant</span>';
 }
 
 window.selectTradeDG=async function(dgId){
