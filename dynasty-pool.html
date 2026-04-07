@@ -399,7 +399,7 @@
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js';
 
 const CFG = {
@@ -841,9 +841,28 @@ async function fetchAllStats(gameIds){
     }
   });
   renderRoster();
-  // Update today stat card
   document.getElementById('s2').textContent='+'+totalToday;
+  await savePointsToFirebase(totalToday);
   notify('Stats LNH mises à jour — '+Object.keys(nhlStatsCache).length+' joueurs chargés');
+}
+
+async function savePointsToFirebase(totalToday){
+  if(!currentUser||isGuest) return;
+  const today=new Date().toISOString().split('T')[0];
+  try{
+    const logRef=doc(db,'pointslog',currentUser.uid+'_'+today);
+    const existing=await getDoc(logRef);
+    if(!existing.exists()||(existing.data().pts||0)<totalToday){
+      await setDoc(logRef,{uid:currentUser.uid,date:today,pts:totalToday,ts:serverTimestamp()});
+    }
+    const logs=await getDocs(collection(db,'pointslog'));
+    let seasonTotal=0;
+    logs.forEach(l=>{if(l.data().uid===currentUser.uid)seasonTotal+=l.data().pts||0;});
+    await updateDoc(doc(db,'users',currentUser.uid),{pts:seasonTotal,today:totalToday,lastSync:today});
+    const myIdx=dgs.findIndex(d=>d.id===currentUser.uid);
+    if(myIdx!==-1){dgs[myIdx].pts=seasonTotal;dgs[myIdx].today=totalToday;}
+    renderDGs();renderClassement();updateStats();
+  }catch(e){console.error('Erreur sauvegarde points:',e);}
 }
 
 window.fetchGameStats=async function(gameId){
