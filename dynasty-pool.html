@@ -149,6 +149,39 @@
   .ac{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px;}
   .ac h3{font-size:11px;font-weight:700;margin-bottom:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
 
+
+  /* TRADE MODAL */
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
+  .modal-bg.hidden{display:none;}
+  .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:800px;max-height:90vh;overflow-y:auto;}
+  .modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:1;}
+  .modal-hdr h2{font-size:17px;font-weight:800;}
+  .modal-close{background:transparent;border:none;color:var(--text2);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px;}
+  .modal-close:hover{background:var(--bg3);color:var(--text);}
+  .modal-body{padding:16px 20px;}
+  .trade-cols{display:grid;grid-template-columns:1fr 60px 1fr;gap:12px;margin-bottom:16px;}
+  .trade-col h3{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+  .trade-col h3::before{content:'';width:3px;height:12px;background:var(--accent);border-radius:2px;}
+  .trade-arrow-col{display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text3);padding-top:28px;}
+  .trade-player{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px;cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:4px;}
+  .trade-player:hover{background:var(--bg3);}
+  .trade-player.selected{background:rgba(200,16,46,0.15);border-color:var(--accent);}
+  .trade-player.selected-receive{background:rgba(16,185,129,0.15);border-color:var(--green);}
+  .trade-chk{width:16px;height:16px;border-radius:4px;border:1px solid var(--border2);background:var(--bg3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;}
+  .trade-player.selected .trade-chk{background:var(--accent);border-color:var(--accent);color:white;}
+  .trade-player.selected-receive .trade-chk{background:var(--green);border-color:var(--green);color:white;}
+  .dg-selector{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
+  .dg-sel-btn{padding:6px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);transition:all .15s;}
+  .dg-sel-btn:hover,.dg-sel-btn.active{background:var(--bg3);color:var(--text);border-color:var(--accent2);}
+  .draft-picks{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .pick-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);transition:all .15s;}
+  .pick-btn.selected{background:rgba(200,16,46,0.15);border-color:var(--accent);color:var(--accent2);}
+  .pick-btn.selected-receive{background:rgba(16,185,129,0.15);border-color:var(--green);color:var(--green);}
+  .trade-summary{background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:14px;font-size:13px;}
+  .trade-summary-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px;}
+  .trade-summary-label{color:var(--text2);min-width:80px;font-size:12px;}
+  .trade-summary-val{font-weight:600;flex:1;}
+  @media(max-width:600px){.trade-cols{grid-template-columns:1fr;}.trade-arrow-col{display:none;}}
   .notif{position:fixed;bottom:18px;right:18px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:9px 13px;font-size:13px;display:flex;align-items:center;gap:7px;z-index:1000;transform:translateY(70px);opacity:0;transition:all .3s;max-width:280px;}
   .notif.show{transform:translateY(0);opacity:1;}
   .nd{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
@@ -187,7 +220,7 @@
   </div>
   <div class="login-divider"><span>ou</span></div>
   <button class="login-guest" onclick="signInGuest()">Voir en mode lecture seule</button>
-  <div style="font-size:11px;color:var(--text3);margin-top:8px;">Saison 2026-27 • 10 DGs</div>
+  <div style="font-size:11px;color:var(--text3);margin-top:8px;">Saison 2024-25 • 10 DGs</div>
 </div>
 
 <!-- LOADING -->
@@ -223,7 +256,7 @@
 
   <div class="layout">
     <div class="sidebar">
-      <div class="slabel">DGs — Saison 2026-27</div>
+      <div class="slabel">DGs — Saison 2024-25</div>
       <div id="dgList"></div>
     </div>
     <div class="main">
@@ -256,7 +289,7 @@
 
       <!-- CLASSEMENT -->
       <div id="view-cl" class="hidden">
-        <div style="margin-bottom:18px;"><h1 style="font-size:21px;font-weight:800;margin-bottom:3px;">Classement</h1><div style="font-size:12px;color:var(--text2);">Saison 2026-27 <span class="fbb">Firebase Live</span></div></div>
+        <div style="margin-bottom:18px;"><h1 style="font-size:21px;font-weight:800;margin-bottom:3px;">Classement</h1><div style="font-size:12px;color:var(--text2);">Saison 2024-25 <span class="fbb">Firebase Live</span></div></div>
         <table class="ct"><thead><tr><th>#</th><th>DG / Équipe</th><th style="text-align:right">Pts saison</th><th style="text-align:right">Pts auj.</th><th style="text-align:right">Statut</th></tr></thead><tbody id="clb"></tbody></table>
       </div>
 
@@ -307,6 +340,57 @@
         <div id="tlog" style="display:flex;flex-direction:column;gap:5px;"></div>
       </div>
 
+    </div>
+  </div>
+</div>
+
+
+<!-- TRADE MODAL -->
+<div class="modal-bg hidden" id="tradeModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <h2>Proposer un trade</h2>
+      <button class="modal-close" onclick="closeTradeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:14px;">
+        <div class="stitle" style="margin-bottom:9px;">Choisir le DG avec qui trader</div>
+        <div class="dg-selector" id="tradeDgSelector"></div>
+      </div>
+      <div class="trade-cols" id="tradeCols" style="display:none">
+        <div class="trade-col">
+          <h3>Tu offres</h3>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Clique pour sélectionner</div>
+          <div id="tradeMyRoster"></div>
+          <div style="margin-top:12px;">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Choix de draft à offrir:</div>
+            <div class="draft-picks" id="tradeMyPicks"></div>
+          </div>
+        </div>
+        <div class="trade-arrow-col">⇄</div>
+        <div class="trade-col">
+          <h3>Tu veux recevoir</h3>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Clique pour sélectionner</div>
+          <div id="tradeTheirRoster"></div>
+          <div style="margin-top:12px;">
+            <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Choix de draft à recevoir:</div>
+            <div class="draft-picks" id="tradeTheirPicks"></div>
+          </div>
+        </div>
+      </div>
+      <div id="tradeSummary" style="display:none">
+        <div class="stitle" style="margin-bottom:9px;">Résumé du trade</div>
+        <div class="trade-summary">
+          <div class="trade-summary-row"><span class="trade-summary-label">Tu offres:</span><span class="trade-summary-val" id="summaryGive">—</span></div>
+          <div class="trade-summary-row"><span class="trade-summary-label">Tu reçois:</span><span class="trade-summary-val" id="summaryReceive">—</span></div>
+          <div class="trade-summary-row"><span class="trade-summary-label">Avec:</span><span class="trade-summary-val" id="summaryWith">—</span></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-p" style="flex:1;" onclick="submitTrade()">📤 Envoyer la proposition</button>
+          <button class="btn btn-c" onclick="resetTradeForm()">↺ Recommencer</button>
+        </div>
+      </div>
+      <div id="tradeEmpty" style="text-align:center;padding:40px;color:var(--text3);font-size:13px;">← Choisis un DG pour commencer</div>
     </div>
   </div>
 </div>
@@ -509,7 +593,7 @@ function render(){
 function updateStats(){
   const dg=dgs.find(d=>d.id===activeDgId)||{};
   document.getElementById('tname').textContent=dg.team||'—';
-  document.getElementById('tmeta').textContent='DG: '+(dg.name||'—')+' • Saison 2026-27';
+  document.getElementById('tmeta').textContent='DG: '+(dg.name||'—')+' • Saison 2024-25';
   document.getElementById('s1').textContent=dg.pts||0;
   document.getElementById('s2').textContent='+'+(dg.today||0);
   document.getElementById('sd').textContent=new Date().toLocaleDateString('fr-CA');
@@ -779,7 +863,148 @@ window.refTrade=async function(fid){
   catch(e){notify('Erreur: '+e.message);}
 };
 
-window.showTradeModal=function(){notify('Interface de trade complète — prochaine phase!');};
+window.showTradeModal=function(){
+  if(isGuest){notify('Connecte-toi pour proposer un trade');return;}
+  document.getElementById('tradeModal').classList.remove('hidden');
+  renderTradeDGSelector();
+  document.getElementById('tradeCols').style.display='none';
+  document.getElementById('tradeSummary').style.display='none';
+  document.getElementById('tradeEmpty').style.display='block';
+  selectedTradeDG=null;selectedGive=[];selectedReceive=[];selectedGivePicks=[];selectedReceivePicks=[];
+};
+
+window.closeTradeModal=function(){document.getElementById('tradeModal').classList.add('hidden');};
+
+let selectedTradeDG=null,selectedGive=[],selectedReceive=[],selectedGivePicks=[],selectedReceivePicks=[];
+let theirRoster=[];
+
+function renderTradeDGSelector(){
+  const others=dgs.filter(d=>currentUser&&d.id!==currentUser.uid);
+  document.getElementById('tradeDgSelector').innerHTML=others.length?others.map(d=>`
+    <button class="dg-sel-btn ${selectedTradeDG===d.id?'active':''}" onclick="selectTradeDG('${d.id}')">${d.name||d.email||'DG'}</button>
+  `).join(''):'<span style="color:var(--text3);font-size:13px;">Aucun autre DG enregistré pour l'instant</span>';
+}
+
+window.selectTradeDG=async function(dgId){
+  selectedTradeDG=dgId;selectedGive=[];selectedReceive=[];selectedGivePicks=[];selectedReceivePicks=[];
+  renderTradeDGSelector();
+  document.getElementById('tradeEmpty').style.display='none';
+  document.getElementById('tradeCols').style.display='grid';
+  document.getElementById('tradeSummary').style.display='none';
+  // Load their roster
+  try{
+    const s=await getDoc(doc(db,'rosters',dgId));
+    theirRoster=s.exists()?(s.data().actif||[]).concat(s.data().reserve||[]):[];
+  }catch{theirRoster=[];}
+  renderTradeRosters();
+  renderTradePicks();
+};
+
+function renderTradeRosters(){
+  const myAll=[...ra,...rr];
+  document.getElementById('tradeMyRoster').innerHTML=myAll.map((p,i)=>`
+    <div class="trade-player ${selectedGive.includes(i)?'selected':''}" onclick="toggleGive(${i})">
+      <div class="trade-chk">${selectedGive.includes(i)?'✓':''}</div>
+      <span class="pos pos-${p.pos}" style="font-size:9px;padding:1px 5px;">${p.pos}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+        <div style="font-size:10px;color:var(--text2)">${p.team} • ${p.seasonPts} pts</div>
+      </div>
+    </div>`).join('')||'<div style="color:var(--text3);font-size:12px;padding:8px;">Roster vide</div>';
+
+  document.getElementById('tradeTheirRoster').innerHTML=theirRoster.map((p,i)=>`
+    <div class="trade-player ${selectedReceive.includes(i)?'selected-receive':''}" onclick="toggleReceive(${i})">
+      <div class="trade-chk">${selectedReceive.includes(i)?'✓':''}</div>
+      <span class="pos pos-${p.pos}" style="font-size:9px;padding:1px 5px;">${p.pos}</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
+        <div style="font-size:10px;color:var(--text2)">${p.team} • ${p.seasonPts} pts</div>
+      </div>
+    </div>`).join('')||'<div style="color:var(--text3);font-size:12px;padding:8px;">Roster vide</div>';
+}
+
+function renderTradePicks(){
+  const curYear=new Date().getFullYear(); const years=[curYear,curYear+1];
+  const rounds=['1re ronde','2e ronde','3e ronde'];
+  const myPicks=[];const theirPicks=[];
+  years.forEach(y=>rounds.forEach(r=>{myPicks.push(`${r} ${y}`);theirPicks.push(`${r} ${y}`);}));
+  document.getElementById('tradeMyPicks').innerHTML=myPicks.map(p=>`
+    <button class="pick-btn ${selectedGivePicks.includes(p)?'selected':''}" onclick="toggleGivePick('${p}')">${p}</button>`).join('');
+  document.getElementById('tradeTheirPicks').innerHTML=theirPicks.map(p=>`
+    <button class="pick-btn ${selectedReceivePicks.includes(p)?'selected-receive':''}" onclick="toggleReceivePick('${p}')">${p}</button>`).join('');
+}
+
+window.toggleGive=function(i){
+  const idx=selectedGive.indexOf(i);
+  if(idx===-1)selectedGive.push(i);else selectedGive.splice(idx,1);
+  renderTradeRosters();updateTradeSummary();
+};
+window.toggleReceive=function(i){
+  const idx=selectedReceive.indexOf(i);
+  if(idx===-1)selectedReceive.push(i);else selectedReceive.splice(idx,1);
+  renderTradeRosters();updateTradeSummary();
+};
+window.toggleGivePick=function(p){
+  const idx=selectedGivePicks.indexOf(p);
+  if(idx===-1)selectedGivePicks.push(p);else selectedGivePicks.splice(idx,1);
+  renderTradePicks();updateTradeSummary();
+};
+window.toggleReceivePick=function(p){
+  const idx=selectedReceivePicks.indexOf(p);
+  if(idx===-1)selectedReceivePicks.push(p);else selectedReceivePicks.splice(idx,1);
+  renderTradePicks();updateTradeSummary();
+};
+
+function updateTradeSummary(){
+  const myAll=[...ra,...rr];
+  const hasAnything=selectedGive.length||selectedReceive.length||selectedGivePicks.length||selectedReceivePicks.length;
+  if(!hasAnything){document.getElementById('tradeSummary').style.display='none';return;}
+  document.getElementById('tradeSummary').style.display='block';
+  const giveNames=selectedGive.map(i=>myAll[i]?.name).filter(Boolean);
+  const receiveNames=selectedReceive.map(i=>theirRoster[i]?.name).filter(Boolean);
+  const allGive=[...giveNames,...selectedGivePicks];
+  const allReceive=[...receiveNames,...selectedReceivePicks];
+  document.getElementById('summaryGive').textContent=allGive.length?allGive.join(', '):'(rien)';
+  document.getElementById('summaryReceive').textContent=allReceive.length?allReceive.join(', '):'(rien)';
+  const dg=dgs.find(d=>d.id===selectedTradeDG);
+  document.getElementById('summaryWith').textContent=dg?.name||'—';
+}
+
+window.resetTradeForm=function(){
+  selectedGive=[];selectedReceive=[];selectedGivePicks=[];selectedReceivePicks=[];
+  renderTradeRosters();renderTradePicks();
+  document.getElementById('tradeSummary').style.display='none';
+};
+
+window.submitTrade=async function(){
+  const myAll=[...ra,...rr];
+  const giveNames=selectedGive.map(i=>myAll[i]?.name).filter(Boolean);
+  const receiveNames=selectedReceive.map(i=>theirRoster[i]?.name).filter(Boolean);
+  const allGive=[...giveNames,...selectedGivePicks];
+  const allReceive=[...receiveNames,...selectedReceivePicks];
+  if(!allGive.length&&!allReceive.length){notify('Sélectionne au moins un joueur ou choix de draft');return;}
+  const meDG=dgs.find(d=>currentUser&&d.id===currentUser.uid);
+  const themDG=dgs.find(d=>d.id===selectedTradeDG);
+  try{
+    await addDoc(collection(db,'trades'),{
+      fromUid:currentUser.uid,
+      toUid:selectedTradeDG,
+      from:meDG?.name||currentUser.email,
+      to:themDG?.name||'—',
+      give:allGive,
+      receive:allReceive,
+      status:'pending',
+      date:new Date().toLocaleDateString('fr-CA'),
+      ts:serverTimestamp()
+    });
+    await logTx((meDG?.name||'Un DG')+' a proposé un trade à '+(themDG?.name||'—'));
+    closeTradeModal();
+    await loadTrades();
+    renderTrades();
+    showView('tr');
+    notify('Trade proposé! En attente de réponse.');
+  }catch(e){notify('Erreur: '+e.message);}
+};
 window.recalc=async function(){await loadDGs();renderClassement();renderDGs();notify('Points recalculés');};
 window.refreshW=async function(){await loadWV();renderWV();notify('Waiver actualisé');};
 window.cancelTrade=function(){if(confirm('Annuler le dernier trade?')){logTx('Trade annulé par le commissaire');notify('Trade annulé');}};
