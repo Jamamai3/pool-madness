@@ -304,6 +304,9 @@
           <div class="scard"><div class="slb">Réserve / IR</div><div class="sv" id="s4">—</div><div class="ss">sur 10 spots</div></div>
         </div>
         <div id="rosterPosBar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
+        <div id="lockBanner" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:14px;display:none;">
+          🔒 Alignement verrouillé — les matchs ont commencé. Tu pourras modifier ton alignement demain matin.
+        </div>
         <div style="position:sticky;top:52px;background:var(--bg);z-index:10;padding-bottom:10px;padding-top:4px;margin:0 -18px;padding-left:18px;padding-right:18px;">
           <div class="shdr" style="margin-bottom:9px;"><div class="stitle">Matchs du jour</div><span style="font-size:11px;color:var(--text3)" id="mdate">—</span></div>
           <div class="mgrid" id="mgrid"><div class="empty"><div class="spin"></div></div></div>
@@ -574,6 +577,7 @@ const MATCHES=[
 
 let currentUser=null, isAdmin=false, isGuest=false;
 let activeDgId=null, viewingOwnTeam=true;
+let lineupLocked=false, firstGameTime=null;
 let dgs=[], ra=[], rr=[], wv=[], trades=[], txlog=[];
 let yesterdayPts = {};
 let autoRefreshInterval = null;
@@ -796,7 +800,7 @@ function renderDGs(){
 }
 
 function renderRoster(){
-  const canEdit = viewingOwnTeam && !isGuest;
+  const canEdit = viewingOwnTeam && !isGuest && !lineupLocked;
   document.getElementById('ra').innerHTML=ra.length?ra.map((p,i)=>{
     const sc=p.status==='active'?'sa':p.status==='ir'?'si':'sr';
     const tc=p.todayPts>0?'color:var(--gold);font-weight:700':'color:var(--text3)';
@@ -895,10 +899,44 @@ async function loadMatches(){
       const scoreStr=(state==='PRE'||state==='FUT')?'–':(awayScore+'–'+homeScore);
       return '<div class="mcard" onclick="fetchGameStats(\''+g.id+'\')"><div class="mteams"><span>'+away+'</span><span class="mscore">'+scoreStr+'</span><span>'+home+'</span></div><div class="mstatus '+cls+'">'+status+'</div></div>';
     }).join('');
+    // Detect first game time and lock lineup if needed
+    checkLineupLock(games);
     const activeGames=games.filter(g=>g.gameState==='OFF'||g.gameState==='FINAL'||g.gameState==='LIVE'||g.gameState==='CRIT');
     if(activeGames.length) await fetchAllStats(activeGames.map(g=>g.id));
   } catch(e) {
     document.getElementById('mgrid').innerHTML=MATCHES.map(m=>{const live=!['Final','19h00','20h00'].includes(m.st);const cls=m.st==='Final'?'final':m.st.includes('h')?'soon':'live';return '<div class="mcard"><div class="mteams"><span>'+m.away+'</span><span class="mscore">'+m.as+'–'+m.hs+'</span><span>'+m.home+'</span></div><div class="mstatus '+cls+'">'+(live?'● ':'')+m.st+'</div></div>';}).join('');
+  }
+}
+
+function checkLineupLock(games){
+  if(!games||!games.length){lineupLocked=false;updateLockBanner();return;}
+  // Find earliest game start time today
+  const scheduled=games.filter(g=>g.startTimeUTC);
+  if(!scheduled.length){lineupLocked=false;updateLockBanner();return;}
+  const earliest=scheduled.reduce((min,g)=>g.startTimeUTC<min?g.startTimeUTC:min,scheduled[0].startTimeUTC);
+  firstGameTime=new Date(earliest);
+  const now=new Date();
+  // Lock if first game has started
+  lineupLocked=now>=firstGameTime;
+  updateLockBanner();
+}
+
+function updateLockBanner(){
+  renderRoster();
+  const banner=document.getElementById('lockBanner');
+  if(banner) banner.style.display=lineupLocked?'flex':'none';
+  const stitle=document.querySelector('#view-eq .shdr .stitle');
+  if(!stitle)return;
+  if(lineupLocked){
+    if(!document.getElementById('lockBadge')){
+      const badge=document.createElement('span');
+      badge.id='lockBadge';
+      badge.style.cssText='font-size:10px;background:rgba(239,68,68,0.2);color:var(--red);padding:2px 8px;border-radius:4px;font-weight:700;margin-left:6px;';
+      badge.textContent='🔒 VERROUILLE';
+      stitle.appendChild(badge);
+    }
+  } else {
+    document.getElementById('lockBadge')?.remove();
   }
 }
 
@@ -1020,6 +1058,7 @@ window.selDG = async function(id, name){
 
 window.mvRes=async function(i){
   if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton equipe');return;}
+  if(lineupLocked){notify('🔒 Alignement verrouille — le premier match a commence. Reviens demain!');return;}
   if(rr.length>=10){notify('Reserve pleine');return;}
   const p=ra.splice(i,1)[0];p.status='reserve';rr.push(p);
   renderRoster();await saveRoster();notify(p.name+' → reserve');
@@ -1027,6 +1066,7 @@ window.mvRes=async function(i){
 
 window.mvAct=async function(i){
   if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton equipe');return;}
+  if(lineupLocked){notify('🔒 Alignement verrouille — le premier match a commence. Reviens demain!');return;}
   const playerToUp = rr[i];
   if(isRosterPosMaxed(playerToUp.pos) && ra.length<20){
     const posName = playerToUp.pos==='G'?'gardiens':playerToUp.pos==='D'?'defenseurs':'attaquants';
