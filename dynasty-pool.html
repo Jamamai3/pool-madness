@@ -310,6 +310,7 @@
           <div class="scard"><div class="slb">Actifs</div><div class="sv gr" id="s3">—</div><div class="ss">sur 20 spots</div></div>
           <div class="scard"><div class="slb">Réserve / IR</div><div class="sv" id="s4">—</div><div class="ss">sur 10 spots</div></div>
         </div>
+        <div id="rosterPosBar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
         <div class="shdr" style="margin-bottom:9px;"><div class="stitle">Matchs du jour</div><span style="font-size:11px;color:var(--text3)" id="mdate">—</span></div>
         <div class="mgrid" id="mgrid"><div class="empty"><div class="spin"></div></div></div>
         <div class="shdr"><div class="stitle">Alignement actif (20)</div><span style="font-size:11px;color:var(--text3)">Points si actif ce jour seulement</span></div>
@@ -775,6 +776,39 @@ function render(){
   renderDGs();renderRoster();renderClassement();renderTrades();renderWV();renderAdmin();loadMatches();updateStats();
 }
 
+const ROSTER_LIMITS = {forwards:12, defense:6, goalies:2};
+
+function getRosterCounts(){
+  let f=0,d=0,g=0;
+  ra.forEach(p=>{
+    if(p.status!=='active') return;
+    if(p.pos==='G') g++;
+    else if(p.pos==='D') d++;
+    else f++;
+  });
+  return {forwards:f, defense:d, goalies:g};
+}
+
+function isRosterPosMaxed(pos){
+  const c=getRosterCounts();
+  if(pos==='G') return c.goalies>=ROSTER_LIMITS.goalies;
+  if(pos==='D') return c.defense>=ROSTER_LIMITS.defense;
+  return c.forwards>=ROSTER_LIMITS.forwards;
+}
+
+function renderRosterPosBar(){
+  const c=getRosterCounts();
+  const bar=document.getElementById('rosterPosBar');
+  if(!bar) return;
+  const mk=(label,cur,max)=>{
+    const full=cur>=max;
+    const bg=full?'rgba(239,68,68,0.15)':'rgba(255,255,255,0.05)';
+    const col=full?'var(--red)':cur>=max-1?'var(--gold)':'var(--text2)';
+    return `<span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;background:${bg};color:${col};border:1px solid ${full?'rgba(239,68,68,0.3)':'var(--border)'};">${label}: ${cur}/${max}${full?' MAX':''}</span>`;
+  };
+  bar.innerHTML=mk('ATT',c.forwards,ROSTER_LIMITS.forwards)+mk('DEF',c.defense,ROSTER_LIMITS.defense)+mk('GOAL',c.goalies,ROSTER_LIMITS.goalies);
+}
+
 function updateStats(){
   const dg=dgs.find(d=>d.id===activeDgId)||{};
   document.getElementById('tname').textContent=dg.team||'—';
@@ -784,6 +818,7 @@ function updateStats(){
   document.getElementById('sd').textContent=new Date().toLocaleDateString('fr-CA');
   document.getElementById('s3').textContent=ra.length;
   document.getElementById('s4').textContent=rr.length;
+  renderRosterPosBar();
 
   // Notice lecture seule
   if(!viewingOwnTeam || isGuest){
@@ -1147,6 +1182,13 @@ window.mvRes=async function(i){
 window.mvAct=async function(i){
   if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton équipe');return;}
   const playerToUp = rr[i];
+  // Check position limit first
+  if(isRosterPosMaxed(playerToUp.pos) && ra.length<20){
+    const posName = playerToUp.pos==='G'?'gardiens':playerToUp.pos==='D'?'défenseurs':'attaquants';
+    const maxVal = playerToUp.pos==='G'?ROSTER_LIMITS.goalies:playerToUp.pos==='D'?ROSTER_LIMITS.defense:ROSTER_LIMITS.forwards;
+    notify('Maximum de '+maxVal+' '+posName+' dans le lineup actif atteint — descends-en un dabord');
+    return;
+  }
   if(ra.length>=20){
     // Show swap modal
     document.getElementById('swapTitle').textContent='Monter '+playerToUp.name+' — qui descend?';
