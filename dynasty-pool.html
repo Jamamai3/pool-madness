@@ -269,7 +269,7 @@
     <div class="nav">
       <button class="nav-btn active" onclick="showView('eq')">Mon équipe</button>
       <button class="nav-btn" onclick="showView('cl')">Classement</button>
-      <button class="nav-btn" onclick="showView('tr')">Trades</button>
+      <button class="nav-btn" onclick="showView('tr');clearTradeBadge()" id="btnTrades">Trades <span id="tradeBadge" style="display:none;background:var(--accent);color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:3px;animation:pulse 2s infinite;">0</span></button>
       <button class="nav-btn" onclick="showView('wv')">Waiver</button>
       <button class="nav-btn" id="adminBtn" style="color:var(--gold);display:none" onclick="showView('ad')">⚙ Admin</button>
     </div>
@@ -758,12 +758,33 @@ async function loadWV(){
 }
 async function saveWV(){try{await setDoc(doc(db,'config','waiver'),{players:wv});}catch(e){}}
 
+let tradesUnsubscribe = null;
+
 async function loadTrades(){
   try{
     const s=await getDocs(collection(db,'trades'));
     trades=[];s.forEach(d=>trades.push({fid:d.id,...d.data()}));
     trades.sort((a,b)=>(b.ts?.seconds||0)-(a.ts?.seconds||0));
   }catch{trades=[];}
+}
+
+function startTradesListener(){
+  if(tradesUnsubscribe) tradesUnsubscribe();
+  if(!currentUser||isGuest) return;
+  const { onSnapshot, collection: col, query: q, where } = window._fsExtras || {};
+  // Use polling every 30s as fallback since onSnapshot needs extra import
+  setInterval(async()=>{
+    const prevCount = trades.filter(t=>t.status==='pending'&&t.toUid===currentUser.uid).length;
+    await loadTrades();
+    const newCount = trades.filter(t=>t.status==='pending'&&t.toUid===currentUser.uid).length;
+    if(newCount > prevCount){
+      renderTrades();
+      // Flash notification
+      notify('🏒 Nouveau trade reçu! Vérifie tes trades.');
+    } else {
+      updateTradeBadge();
+    }
+  }, 30000);
 }
 
 async function logTx(msg){
@@ -905,6 +926,24 @@ function renderClassement(){
   }).join('');
 }
 
+function updateTradeBadge(){
+  if(!currentUser) return;
+  const myPending = trades.filter(t=>t.status==='pending' && t.toUid===currentUser.uid);
+  const badge = document.getElementById('tradeBadge');
+  if(!badge) return;
+  if(myPending.length > 0){
+    badge.textContent = myPending.length;
+    badge.style.display = 'inline';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+window.clearTradeBadge = function(){
+  const badge = document.getElementById('tradeBadge');
+  if(badge) badge.style.display = 'none';
+};
+
 function renderTrades(){
   const pend=trades.filter(t=>t.status==='pending');
   const hist=trades.filter(t=>t.status!=='pending');
@@ -923,6 +962,7 @@ function renderTrades(){
     <div class="tf"><div class="ts"><div class="tdg2">${t.from}:</div><div class="tp">${(t.give||[]).join(', ')}</div></div>
     <div class="ta2">⇄</div>
     <div class="ts"><div class="tdg2">${t.to}:</div><div class="tp">${(t.receive||[]).join(', ')}</div></div></div></div>`).join(''):'<div class="empty">Aucun trade complété</div>';
+  updateTradeBadge();
 }
 
 function renderWV(){renderWVList(wv);}
@@ -971,11 +1011,24 @@ async function loadMatches(){
   stopAutoRefresh(); startAutoRefresh();
   try {
     const today=new Date().toISOString().split('T')[0];
-    const proxy='https://api.allorigins.win/get?url=';
-    const r=await fetch(proxy+encodeURIComponent('https://api-web.nhle.com/v1/score/'+today));
-    if(!r.ok) throw new Error('API non disponible');
-    const raw=await r.json();
-    const d=JSON.parse(raw.contents);
+    // Try multiple proxies
+    let d = null;
+    const proxies = [
+      url => 'https://corsproxy.io/?'+encodeURIComponent(url),
+      url => 'https://api.allorigins.win/get?url='+encodeURIComponent(url),
+    ];
+    const nhlUrl = 'https://api-web.nhle.com/v1/score/'+today;
+    for(const makeProxy of proxies){
+      try{
+        const r = await fetch(makeProxy(nhlUrl));
+        if(!r.ok) continue;
+        const raw = await r.json();
+        d = raw.contents ? JSON.parse(raw.contents) : raw;
+        if(d && d.games !== undefined) break;
+        d = null;
+      }catch(e2){ continue; }
+    }
+    if(!d) throw new Error('API non disponible');
     const games=d.games||[];
     nhlGamesCache=games;
     if(!games.length){
@@ -1023,11 +1076,22 @@ async function loadMatches(){
 async function fetchAllStats(gameIds){
   for(const id of gameIds){
     try{
-      const proxy='https://api.allorigins.win/get?url=';
-      const r=await fetch(proxy+encodeURIComponent('https://api-web.nhle.com/v1/gamecenter/'+id+'/boxscore'));
-      if(!r.ok) continue;
-      const raw=await r.json();
-      const d=JSON.parse(raw.contents);
+      const boxUrl = 'https://api-web.nhle.com/v1/gamecenter/'+id+'/boxscore';
+      let d = null;
+      for(const makeProxy of [
+        url=>'https://corsproxy.io/?'+encodeURIComponent(url),
+        url=>'https://api.allorigins.win/get?url='+encodeURIComponent(url),
+      ]){
+        try{
+          const r=await fetch(makeProxy(boxUrl));
+          if(!r.ok) continue;
+          const raw=await r.json();
+          d=raw.contents?JSON.parse(raw.contents):raw;
+          if(d&&d.playerByGameStats) break;
+          d=null;
+        }catch(e3){continue;}
+      }
+      if(!d) continue;
       // Extract player stats from both teams
       const teams=[d.playerByGameStats?.homeTeam, d.playerByGameStats?.awayTeam].filter(Boolean);
       teams.forEach(team=>{
@@ -1097,6 +1161,7 @@ function showApp(){
   document.getElementById('lov').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   startAutoRefresh();
+  startTradesListener();
 }
 
 // ACTIONS
