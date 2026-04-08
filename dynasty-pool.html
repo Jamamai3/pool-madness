@@ -14,8 +14,6 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
-
-  /* LOGIN SCREEN */
   .login-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;z-index:999;}
   .login-screen.hidden{display:none;}
   .login-logo{width:72px;height:72px;background:var(--accent);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;}
@@ -29,14 +27,11 @@
   .login-divider span{font-size:12px;color:var(--text3);}
   .login-guest{background:transparent;border:1px solid var(--border2);color:var(--text2);border-radius:10px;padding:10px 24px;font-size:14px;cursor:pointer;transition:all .15s;}
   .login-guest:hover{background:var(--bg2);color:var(--text);}
-
-  /* LOADING */
   .lov{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:998;}
   .lov.hidden{display:none;}
   .spin{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;}
   @keyframes sp{to{transform:rotate(360deg);}}
-
-  /* HEADER */
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
   .header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 14px;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:100;gap:8px;}
   .logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;white-space:nowrap;}
   .logo-icon{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
@@ -51,8 +46,6 @@
   .user-role{font-size:10px;color:var(--gold);}
   .signout-btn{background:transparent;border:none;color:var(--text3);font-size:11px;cursor:pointer;padding:2px 6px;border-radius:4px;}
   .signout-btn:hover{color:var(--red);}
-
-  /* LAYOUT */
   .layout{display:grid;grid-template-columns:228px 1fr;min-height:calc(100vh - 52px);overflow:visible;}
   .sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:12px 10px;overflow-y:auto;}
   .slabel{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;padding:0 3px;}
@@ -67,11 +60,8 @@
   .dgrank{font-size:11px;font-weight:700;color:var(--text3);min-width:16px;text-align:right;}
   .dgrank.top{color:var(--gold);}
   .you-badge{font-size:9px;background:var(--accent);color:white;padding:1px 5px;border-radius:3px;font-weight:700;flex-shrink:0;}
-
   .main{padding:18px;overflow-y:visible;}
   .hidden{display:none!important;}
-
-  /* STATS */
   .thdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap;}
   .thdr h1{font-size:21px;font-weight:800;letter-spacing:-.5px;margin-bottom:3px;}
   .tmeta{font-size:12px;color:var(--text2);}
@@ -81,18 +71,16 @@
   .sv{font-size:23px;font-weight:800;letter-spacing:-1px;line-height:1;}
   .ss{font-size:11px;color:var(--text2);margin-top:3px;}
   .sv.ac{color:var(--accent2);}.sv.go{color:var(--gold);}.sv.gr{color:var(--green);}
-
   .shdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
   .stitle{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:6px;}
   .stitle::before{content:'';width:3px;height:12px;background:var(--accent);border-radius:2px;}
-
   .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:7px;margin-bottom:16px;}
-  .mcard{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;}
+  .mcard{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;cursor:pointer;}
+  .mcard:hover{border-color:var(--border2);}
   .mteams{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:3px;}
   .mscore{font-size:16px;font-weight:800;color:var(--accent2);letter-spacing:2px;}
   .mstatus{font-size:10px;font-weight:600;}
   .mstatus.live{color:var(--green);}.mstatus.final{color:var(--text3);}.mstatus.soon{color:var(--text2);}
-
   .rt{width:100%;border-collapse:collapse;margin-bottom:16px;}
   .rt th{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);text-align:left;padding:6px 8px;border-bottom:1px solid var(--border);}
   .rt th.r,.rt td.r{text-align:right;}
@@ -113,9 +101,7 @@
   .ab:hover{background:var(--bg3);color:var(--text);}
   .ab.danger:hover{border-color:var(--red);color:var(--red);}
   .ab:disabled{opacity:0.3;cursor:not-allowed;}
-
   .readonly-notice{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-
   .ct{width:100%;border-collapse:collapse;}
   .ct th{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);text-align:left;padding:7px 12px;border-bottom:1px solid var(--border);}
   .ct td{padding:10px 12px;font-size:13px;border-bottom:1px solid var(--border);}
@@ -124,7 +110,6 @@
   .rn.g{color:var(--gold);}.rn.s{color:#94a3b8;}.rn.b{color:#b45309;}
   .pb{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px;width:90px;}
   .pbf{height:100%;background:var(--accent);border-radius:2px;}
-
   .tc{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px;margin-bottom:9px;}
   .th2{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;}
   .tbg{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;}
@@ -141,16 +126,11 @@
   .btn-c{background:transparent;border:1px solid var(--border2);color:var(--text2);}
   .btn-p{background:var(--accent);color:white;}
   .btn:hover{opacity:.85;}
-
   .wi{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;display:flex;align-items:center;gap:9px;margin-bottom:7px;}
   .wi:hover{border-color:var(--border2);}
-
   .ag{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:18px;}
   .ac{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:13px;}
   .ac h3{font-size:11px;font-weight:700;margin-bottom:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;}
-
-
-  /* TRADE MODAL */
   .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;}
   .modal-bg.hidden{display:none;}
   .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:800px;max-height:90vh;overflow-y:auto;}
@@ -182,9 +162,6 @@
   .trade-summary-label{color:var(--text2);min-width:80px;font-size:12px;}
   .trade-summary-val{font-weight:600;flex:1;}
   @media(max-width:600px){.trade-cols{grid-template-columns:1fr;}.trade-arrow-col{display:none;}}
-
-
-  /* CHAT */
   .chat-container{display:flex;flex-direction:column;height:calc(100vh - 160px);min-height:400px;}
   .chat-messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:10px 10px 0 0;margin-bottom:0;}
   .chat-msg{display:flex;gap:8px;align-items:flex-start;}
@@ -205,7 +182,6 @@
   .tab-btn:hover{color:var(--text);}
   .tab-btn.active{border-bottom-color:var(--accent);color:var(--accent2);}
   .priv-badge{display:inline-block;background:var(--blue2);color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:3px;}
-  /* DRAFT */
   .draft-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:960px;max-height:92vh;overflow-y:auto;}
   .draft-header{background:var(--bg);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2;}
   .draft-turn{background:var(--accent);color:white;border-radius:8px;padding:8px 16px;font-weight:700;font-size:14px;text-align:center;}
@@ -231,28 +207,25 @@
   .draft-setup h3{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--text2);}
   .dg-order-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg3);border-radius:7px;margin-bottom:6px;border:1px solid var(--border);}
   .dg-order-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-
   .swap-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;width:100%;max-width:420px;max-height:80vh;overflow-y:auto;}
   .swap-player{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:7px;cursor:pointer;border:1px solid var(--border);margin-bottom:5px;transition:all .15s;}
   .swap-player:hover{background:var(--bg3);border-color:var(--accent);}
+  .admin-roster-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;}
+  .keeper-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;cursor:pointer;border:1px solid var(--border);margin-bottom:5px;transition:all .15s;}
+  .keeper-item:hover{border-color:var(--border2);}
+  .keeper-item.selected{background:rgba(16,185,129,0.1);border-color:var(--green);}
+  .keeper-chk{width:16px;height:16px;border-radius:4px;border:1px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;flex-shrink:0;}
+  .keeper-item.selected .keeper-chk{background:var(--green);border-color:var(--green);}
   .notif{position:fixed;bottom:18px;right:18px;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:9px 13px;font-size:13px;display:flex;align-items:center;gap:7px;z-index:1000;transform:translateY(70px);opacity:0;transition:all .3s;max-width:280px;}
   .notif.show{transform:translateY(0);opacity:1;}
   .nd{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
-
   .empty{text-align:center;padding:28px;color:var(--text3);font-size:13px;}
   .fbb{font-size:10px;background:rgba(255,160,0,.15);color:#ffa000;padding:2px 7px;border-radius:4px;font-weight:700;}
-
-  @media(max-width:780px){
-    .layout{grid-template-columns:1fr;}
-    .sidebar{display:none;}
-    .stats{grid-template-columns:repeat(2,1fr);}
-    .ag{grid-template-columns:1fr;}
-  }
+  @media(max-width:780px){.layout{grid-template-columns:1fr;}.sidebar{display:none;}.stats{grid-template-columns:repeat(2,1fr);}.ag{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
 <div class="login-screen" id="loginScreen">
   <div class="login-logo">🏒</div>
   <div class="login-title">Pool Madness</div>
@@ -273,10 +246,9 @@
   </div>
   <div class="login-divider"><span>ou</span></div>
   <button class="login-guest" onclick="signInGuest()">Voir en mode lecture seule</button>
-  <div style="font-size:11px;color:var(--text3);margin-top:8px;">Saison 2024-25 • 10 DGs</div>
+  <div style="font-size:11px;color:var(--text3);margin-top:8px;">Saison 2024-25 • Pool Dynasty LNH</div>
 </div>
 
-<!-- LOADING -->
 <div class="lov" id="lov">
   <div style="width:48px;height:48px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">🏒</div>
   <div style="font-size:19px;font-weight:800;">Pool Madness</div>
@@ -284,7 +256,6 @@
   <div style="font-size:13px;color:var(--text2);" id="lovText">Connexion...</div>
 </div>
 
-<!-- APP -->
 <div id="app" class="hidden">
   <div class="header">
     <div class="logo"><div class="logo-icon">🏒</div>Pool Madness</div>
@@ -293,7 +264,7 @@
       <button class="nav-btn" onclick="showView('cl')">Classement</button>
       <button class="nav-btn" onclick="showView('tr');clearTradeBadge()" id="btnTrades">Trades <span id="tradeBadge" style="display:none;background:var(--accent);color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:3px;animation:pulse 2s infinite;">0</span></button>
       <button class="nav-btn" onclick="showView('wv')">Waiver</button>
-      <button class="nav-btn" onclick="showView('ch');markChatRead()" id="btnChat">Chat <span id="chatBadge" style="display:none;background:var(--blue2);color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:3px;">●</span></button>
+      <button class="nav-btn" onclick="showView('ch');markChatRead()" id="btnChat">Chat <span id="chatBadge" style="display:none;background:#3b82f6;color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:3px;">●</span></button>
       <button class="nav-btn" id="adminBtn" style="color:var(--gold);display:none" onclick="showView('ad')">⚙ Admin</button>
     </div>
     <div style="display:flex;align-items:center;gap:6px;">
@@ -315,10 +286,9 @@
     </div>
     <div class="main">
 
-      <!-- MON ÉQUIPE -->
       <div id="view-eq">
         <div id="readonlyNotice" class="readonly-notice hidden">
-          👁 Mode lecture seule — tu vois l'équipe de <span id="readonlyName"></span>. Connecte-toi pour gérer ton équipe.
+          👁 Mode lecture seule — tu vois l'équipe de <span id="readonlyName"></span>.
         </div>
         <div class="thdr">
           <div><h1 id="tname">—</h1><div class="tmeta" id="tmeta">—</div></div>
@@ -339,18 +309,16 @@
           <div class="mgrid" id="mgrid"><div class="empty"><div class="spin"></div></div></div>
         </div>
         <div class="shdr"><div class="stitle">Alignement actif (20)</div><span style="font-size:11px;color:var(--text3)">Points si actif ce jour seulement</span></div>
-        <table class="rt"><thead><tr><th>#</th><th>Joueur</th><th>Pos</th><th>Équipe</th><th>Statut</th><th class="r">Pts hier</th><th class="r">Pts auj.</th><th class="r">Pts saison</th><th class="r">Action</th></tr></thead><tbody id="ra"><tr><td colspan="8" class="empty"><div class="spin"></div></td></tr></tbody></table>
+        <table class="rt"><thead><tr><th>#</th><th>Joueur</th><th>Pos</th><th>Équipe</th><th>Statut</th><th class="r">Pts hier</th><th class="r">Pts auj.</th><th class="r">Pts saison</th><th class="r">Action</th></tr></thead><tbody id="ra"><tr><td colspan="9" class="empty"><div class="spin"></div></td></tr></tbody></table>
         <div class="shdr"><div class="stitle">Réserve / IR (10)</div><span style="font-size:11px;color:var(--text3)">Ne comptent pas</span></div>
         <table class="rt"><thead><tr><th>#</th><th>Joueur</th><th>Pos</th><th>Équipe</th><th>Statut</th><th class="r">Pts saison</th><th class="r">Action</th></tr></thead><tbody id="rr"><tr><td colspan="7" class="empty"><div class="spin"></div></td></tr></tbody></table>
       </div>
 
-      <!-- CLASSEMENT -->
       <div id="view-cl" class="hidden">
         <div style="margin-bottom:18px;"><h1 style="font-size:21px;font-weight:800;margin-bottom:3px;">Classement</h1><div style="font-size:12px;color:var(--text2);">Saison 2024-25 <span class="fbb">Firebase Live</span></div></div>
         <table class="ct"><thead><tr><th>#</th><th>DG / Équipe</th><th style="text-align:right">Pts saison</th><th style="text-align:right">Pts auj.</th><th style="text-align:right">Pts hier</th><th style="text-align:right">Statut</th></tr></thead><tbody id="clb"></tbody></table>
       </div>
 
-      <!-- TRADES -->
       <div id="view-tr" class="hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:9px;">
           <div><h1 style="font-size:21px;font-weight:800;margin-bottom:3px;">Trades</h1><div style="font-size:12px;color:var(--text2);">Propositions et historique <span class="fbb">Firebase Live</span></div></div>
@@ -362,7 +330,6 @@
         <div id="trh"></div>
       </div>
 
-      <!-- WAIVER -->
       <div id="view-wv" class="hidden">
         <div style="margin-bottom:18px;"><h1 style="font-size:21px;font-weight:800;margin-bottom:3px;">Waiver Wire</h1><div style="font-size:12px;color:var(--text2);">Joueurs disponibles <span class="fbb">Firebase Live</span></div></div>
         <div style="display:flex;gap:9px;margin-bottom:12px;flex-wrap:wrap;">
@@ -374,18 +341,15 @@
         <div id="wl"></div>
       </div>
 
-      <!-- CHAT -->
       <div id="view-ch" class="hidden">
         <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
           <div><h1 style="font-size:21px;font-weight:800;margin-bottom:3px;">Chat de ligue</h1><div style="font-size:12px;color:var(--text2);">Discussions entre DGs <span class="fbb">Firebase Live</span></div></div>
           <button class="btn btn-p" onclick="openPrivateChat()" style="font-size:12px;">✉ Message privé</button>
         </div>
-        <!-- Chat tabs -->
         <div style="display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:0;">
           <button class="tab-btn active" id="tabGeneral" onclick="switchChatTab('general')" style="padding:8px 14px;background:transparent;border:none;border-bottom:2px solid var(--accent);color:var(--accent2);font-size:13px;font-weight:600;cursor:pointer;">Général</button>
           <div id="privateTabs" style="display:flex;gap:4px;"></div>
         </div>
-        <!-- General chat -->
         <div id="chatGeneral" class="chat-container" style="margin-top:0;border-radius:0 10px 0 0;">
           <div class="chat-messages" id="chatMessages"><div class="empty"><div class="spin"></div></div></div>
           <div class="chat-input-row">
@@ -393,9 +357,7 @@
             <button class="chat-send" onclick="sendChatMsg('general')">Envoyer</button>
           </div>
         </div>
-        <!-- Private chats (dynamic) -->
         <div id="privateChatContainers"></div>
-        <!-- DG selector for private chat -->
         <div class="modal-bg hidden" id="privateChatModal">
           <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;width:100%;max-width:360px;padding:20px;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -408,11 +370,14 @@
         </div>
       </div>
 
-      <!-- ADMIN -->
       <div id="view-ad" class="hidden">
         <div style="margin-bottom:18px;"><h1 style="font-size:21px;font-weight:800;margin-bottom:3px;">⚙ Administration</h1><div style="font-size:12px;color:var(--text2);">Commissaire <span class="fbb">Firebase Live</span></div></div>
         <div class="ag">
-          <div class="ac"><h3>DGs enregistrés</h3><div id="adgl"></div><button class="ab" style="margin-top:9px;width:100%;" onclick="notify('Inviter un DG — envoyez-leur le lien et ils se connectent avec Google!')">+ Inviter un DG</button></div>
+          <div class="ac">
+            <h3>DGs enregistrés</h3>
+            <div id="adgl"></div>
+            <button class="ab" style="margin-top:9px;width:100%;" onclick="notify('Envoyez-leur le lien — ils se connectent avec Google ou email!')">+ Inviter un DG</button>
+          </div>
           <div class="ac"><h3>Actions ligue</h3><div style="display:flex;flex-direction:column;gap:6px;">
             <button class="btn btn-p" style="width:100%;margin-bottom:6px;" onclick="openDraftModal()">🏒 Gérer le draft</button>
             <button class="ab" style="width:100%;text-align:left;" onclick="recalc()">↻ Recalculer tous les points</button>
@@ -436,39 +401,16 @@
   </div>
 </div>
 
-
 <!-- TRADE MODAL -->
 <div class="modal-bg hidden" id="tradeModal">
   <div class="modal">
-    <div class="modal-hdr">
-      <h2>Proposer un trade</h2>
-      <button class="modal-close" onclick="closeTradeModal()">✕</button>
-    </div>
+    <div class="modal-hdr"><h2>Proposer un trade</h2><button class="modal-close" onclick="closeTradeModal()">✕</button></div>
     <div class="modal-body">
-      <div style="margin-bottom:14px;">
-        <div class="stitle" style="margin-bottom:9px;">Choisir le DG avec qui trader</div>
-        <div class="dg-selector" id="tradeDgSelector"></div>
-      </div>
+      <div style="margin-bottom:14px;"><div class="stitle" style="margin-bottom:9px;">Choisir le DG avec qui trader</div><div class="dg-selector" id="tradeDgSelector"></div></div>
       <div class="trade-cols" id="tradeCols" style="display:none">
-        <div class="trade-col">
-          <h3>Tu offres</h3>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Clique pour sélectionner</div>
-          <div id="tradeMyRoster"></div>
-          <div style="margin-top:12px;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Choix de draft à offrir:</div>
-            <div class="draft-picks" id="tradeMyPicks"></div>
-          </div>
-        </div>
+        <div class="trade-col"><h3>Tu offres</h3><div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Clique pour sélectionner</div><div id="tradeMyRoster"></div><div style="margin-top:12px;"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Choix de draft à offrir:</div><div class="draft-picks" id="tradeMyPicks"></div></div></div>
         <div class="trade-arrow-col">⇄</div>
-        <div class="trade-col">
-          <h3>Tu veux recevoir</h3>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Clique pour sélectionner</div>
-          <div id="tradeTheirRoster"></div>
-          <div style="margin-top:12px;">
-            <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Choix de draft à recevoir:</div>
-            <div class="draft-picks" id="tradeTheirPicks"></div>
-          </div>
-        </div>
+        <div class="trade-col"><h3>Tu veux recevoir</h3><div style="font-size:11px;color:var(--text3);margin-bottom:8px;">Clique pour sélectionner</div><div id="tradeTheirRoster"></div><div style="margin-top:12px;"><div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Choix de draft à recevoir:</div><div class="draft-picks" id="tradeTheirPicks"></div></div></div>
       </div>
       <div id="tradeSummary" style="display:none">
         <div class="stitle" style="margin-bottom:9px;">Résumé du trade</div>
@@ -477,89 +419,53 @@
           <div class="trade-summary-row"><span class="trade-summary-label">Tu reçois:</span><span class="trade-summary-val" id="summaryReceive">—</span></div>
           <div class="trade-summary-row"><span class="trade-summary-label">Avec:</span><span class="trade-summary-val" id="summaryWith">—</span></div>
         </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-p" style="flex:1;" onclick="submitTrade()">📤 Envoyer la proposition</button>
-          <button class="btn btn-c" onclick="resetTradeForm()">↺ Recommencer</button>
-        </div>
+        <div style="display:flex;gap:8px;"><button class="btn btn-p" style="flex:1;" onclick="submitTrade()">📤 Envoyer la proposition</button><button class="btn btn-c" onclick="resetTradeForm()">↺ Recommencer</button></div>
       </div>
       <div id="tradeEmpty" style="text-align:center;padding:40px;color:var(--text3);font-size:13px;">← Choisis un DG pour commencer</div>
     </div>
   </div>
 </div>
 
-
 <!-- DRAFT MODAL -->
 <div class="modal-bg hidden" id="draftModal">
   <div class="draft-modal">
     <div class="draft-header">
-      <div>
-        <div style="font-size:16px;font-weight:800;">Draft — Saison 2024-25</div>
-        <div style="font-size:11px;color:var(--text2);" id="draftRoundInfo">Configuration</div>
-      </div>
+      <div><div style="font-size:16px;font-weight:800;">Draft — Saison 2024-25</div><div style="font-size:11px;color:var(--text2);" id="draftRoundInfo">Configuration</div></div>
       <div style="display:flex;align-items:center;gap:12px;">
         <div class="draft-timer hidden" id="draftTimer">—</div>
         <div class="draft-turn waiting" id="draftTurnBadge">En attente</div>
         <button class="modal-close" onclick="closeDraftModal()">✕</button>
       </div>
     </div>
-
-    <!-- SETUP PHASE -->
     <div id="draftSetup" class="draft-setup">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div>
           <h3>Ordre du draft (glisse pour réorganiser)</h3>
           <div id="draftOrderList" style="margin-bottom:12px;"></div>
-          <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">Les DGs doivent être connectés pour apparaître dans la liste</div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">Les DGs doivent être connectés pour apparaître</div>
         </div>
         <div>
           <h3>Paramètres</h3>
           <div style="display:flex;flex-direction:column;gap:12px;">
-            <div>
-              <div style="font-size:12px;color:var(--text2);margin-bottom:5px;">Nombre de rondes</div>
-              <input type="number" id="draftRounds" value="30" min="1" max="50" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:14px;">
-            </div>
-            <div>
-              <div style="font-size:12px;color:var(--text2);margin-bottom:5px;">Timer par pick (0 = pas de limite)</div>
-              <div style="display:flex;align-items:center;gap:10px;">
-                <input type="range" id="draftTimerRange" min="0" max="300" step="30" value="120" style="flex:1;" oninput="updateTimerLabel()">
-                <span id="draftTimerLabel" style="font-size:13px;font-weight:700;min-width:60px;">2:00</span>
-              </div>
-            </div>
-            <div>
-              <div style="font-size:12px;color:var(--text2);margin-bottom:5px;">Type de draft</div>
-              <select id="draftType" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:13px;">
-                <option value="serpentin">Serpentin (recommandé)</option>
-                <option value="lineaire">Linéaire (même ordre chaque ronde)</option>
-              </select>
-            </div>
+            <div><div style="font-size:12px;color:var(--text2);margin-bottom:5px;">Nombre de rondes</div><input type="number" id="draftRounds" value="30" min="1" max="50" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:14px;"></div>
+            <div><div style="font-size:12px;color:var(--text2);margin-bottom:5px;">Timer par pick (0 = pas de limite)</div><div style="display:flex;align-items:center;gap:10px;"><input type="range" id="draftTimerRange" min="0" max="300" step="30" value="120" style="flex:1;" oninput="updateTimerLabel()"><span id="draftTimerLabel" style="font-size:13px;font-weight:700;min-width:60px;">2:00</span></div></div>
+            <div><div style="font-size:12px;color:var(--text2);margin-bottom:5px;">Type de draft</div><select id="draftType" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:13px;"><option value="serpentin">Serpentin (recommandé)</option><option value="lineaire">Linéaire</option></select></div>
           </div>
           <button class="btn btn-p" style="width:100%;margin-top:16px;padding:10px;" onclick="startDraft()">🏒 Lancer le draft</button>
         </div>
       </div>
     </div>
-
-    <!-- DRAFT LIVE PHASE -->
     <div id="draftLive" class="hidden">
       <div class="draft-board">
-        <div class="draft-order">
-          <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Ordre des picks</div>
-          <div id="draftPickList"></div>
-        </div>
+        <div class="draft-order"><div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Ordre des picks</div><div id="draftPickList"></div></div>
         <div class="draft-players">
           <div class="draft-filters">
             <input type="text" id="draftSearch" placeholder="Chercher un joueur..." style="flex:1;min-width:120px;padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:12px;" oninput="filterDraftPlayers()">
             <select id="draftPosFilter" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:12px;" onchange="filterDraftPlayers()">
-              <option value="">Toutes positions</option>
-              <option value="C">Centre</option>
-              <option value="LW">Ailier G</option>
-              <option value="RW">Ailier D</option>
-              <option value="D">Défenseur</option>
-              <option value="G">Gardien</option>
+              <option value="">Toutes positions</option><option value="C">Centre</option><option value="LW">Ailier G</option><option value="RW">Ailier D</option><option value="D">Défenseur</option><option value="G">Gardien</option>
             </select>
           </div>
-          <div id="draftMyTurn" class="hidden" style="background:rgba(200,16,46,0.1);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--accent2);">
-            🏒 C'est ton tour de choisir!
-          </div>
+          <div id="draftMyTurn" class="hidden" style="background:rgba(200,16,46,0.1);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--accent2);">🏒 C'est ton tour de choisir!</div>
           <div class="draft-player-list" id="draftPlayerList"></div>
         </div>
       </div>
@@ -567,17 +473,28 @@
   </div>
 </div>
 
-
 <!-- SWAP MODAL -->
 <div class="modal-bg hidden" id="swapModal">
   <div class="swap-modal">
-    <div class="modal-hdr">
-      <h2 id="swapTitle">Choisir qui descendre</h2>
-      <button class="modal-close" onclick="document.getElementById('swapModal').classList.add('hidden')">✕</button>
-    </div>
+    <div class="modal-hdr"><h2 id="swapTitle">Choisir qui descendre</h2><button class="modal-close" onclick="document.getElementById('swapModal').classList.add('hidden')">✕</button></div>
+    <div class="modal-body"><div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Choisis un joueur de même position à descendre en réserve.</div><div id="swapList"></div></div>
+  </div>
+</div>
+
+<!-- ADMIN ROSTER MODAL -->
+<div class="modal-bg hidden" id="adminRosterModal">
+  <div class="admin-roster-modal">
+    <div class="modal-hdr"><h2 id="adminRosterTitle">Roster de —</h2><button class="modal-close" onclick="document.getElementById('adminRosterModal').classList.add('hidden')">✕</button></div>
     <div class="modal-body">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">L'alignement actif est plein (20/20). Choisis un joueur à descendre en réserve pour faire de la place.</div>
-      <div id="swapList"></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+        <div style="font-size:13px;color:var(--text2);">Keepers à conserver:</div>
+        <input type="number" id="keepersCount" value="15" min="0" max="30" style="width:65px;padding:5px 8px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:14px;">
+        <button class="ab" onclick="selectTopKeepers()">Auto — meilleurs</button>
+        <button class="btn btn-p" style="font-size:12px;" onclick="saveAdminKeepers()">💾 Sauvegarder</button>
+        <button class="btn btn-r" style="font-size:12px;" onclick="releaseNonKeepers()">↓ Relâcher les autres</button>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Coche les joueurs à conserver. Les autres seront relâchés dans le waiver wire.</div>
+      <div id="adminRosterList" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
     </div>
   </div>
 </div>
@@ -597,14 +514,10 @@ const CFG = {
   messagingSenderId:"86076517807",
   appId:"1:86076517807:web:ac7201f1a04f37eab5135a"
 };
-
 const app = initializeApp(CFG);
 const db = getFirestore(app);
 const auth = getAuth(app);
-
-// COMMISSAIRE — ton UID Google sera ici après ton premier login
 const ADMIN_EMAIL = 'jakob.et.mathis@gmail.com';
-
 const COLORS=['#c8102e','#2563eb','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'];
 
 const RA_DEF=[
@@ -662,8 +575,21 @@ const MATCHES=[
 let currentUser=null, isAdmin=false, isGuest=false;
 let activeDgId=null, viewingOwnTeam=true;
 let dgs=[], ra=[], rr=[], wv=[], trades=[], txlog=[];
+let yesterdayPts = {};
+let autoRefreshInterval = null;
+let tradesUnsubscribe = null;
+let chatMessages = [];
+let chatLastRead = 0;
+let chatPolling = null;
+let privateChats = {};
+let activePrivateChats = [];
+let activeChatTab = 'general';
+let unreadPrivate = {};
+let adminRosterDgId = null;
+let adminRosterActif = [];
+let adminRosterReserve = [];
+let adminKeepers = new Set();
 
-// AUTH STATE
 onAuthStateChanged(auth, async user => {
   if(user) {
     currentUser = user;
@@ -682,43 +608,33 @@ onAuthStateChanged(auth, async user => {
 });
 
 async function setupUser(user) {
-  // Vérifie si le DG existe dans Firebase
   const dgSnap = await getDoc(doc(db, 'users', user.uid));
   if(!dgSnap.exists()) {
-    // Nouveau DG — crée son profil
     const dgCount = (await getDocs(collection(db, 'users'))).size;
     await setDoc(doc(db, 'users', user.uid), {
-      uid: user.uid,
-      email: user.email,
+      uid: user.uid, email: user.email,
       name: user.displayName || user.email,
       photoURL: user.photoURL || null,
-      team: (user.displayName || 'Équipe') + ' FC',
-      pts: 0,
-      today: 0,
-      color: dgCount % 10,
+      team: (user.displayName || 'Equipe') + ' FC',
+      pts: 0, today: 0, color: dgCount % 10,
       role: user.email === ADMIN_EMAIL ? 'admin' : 'dg',
       createdAt: serverTimestamp()
     });
-    // Roster vide pour ce nouveau DG
     await setDoc(doc(db, 'rosters', user.uid), {
       actif: dgCount === 0 ? RA_DEF : [],
       reserve: dgCount === 0 ? RR_DEF : [],
       ts: serverTimestamp()
     });
   }
-
   isAdmin = user.email === ADMIN_EMAIL;
   activeDgId = user.uid;
   viewingOwnTeam = true;
-
-  // Update UI
   document.getElementById('userName').textContent = user.displayName || user.email;
   document.getElementById('userRole').textContent = isAdmin ? '⚙ Commissaire' : 'DG';
   document.getElementById('userAvPlaceholder').textContent = (user.displayName||user.email)[0].toUpperCase();
   if(user.photoURL) {
     const av = document.createElement('img');
-    av.src = user.photoURL;
-    av.className = 'user-av';
+    av.src = user.photoURL; av.className = 'user-av';
     document.getElementById('userAvPlaceholder').replaceWith(av);
   }
   if(isAdmin) document.getElementById('adminBtn').style.display = 'block';
@@ -731,29 +647,21 @@ async function loadAll() {
   await loadTrades();
   await loadMatches();
   render();
-  // Load today's points from cache if already saved
   if(currentUser && !isGuest) await loadTodayPoints();
 }
-
-let yesterdayPts = {};
 
 async function loadTodayPoints(){
   const today = new Date().toISOString().split('T')[0];
   const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
   const yDate = yesterday.toISOString().split('T')[0];
   try{
-    // Load today
     const snap = await getDoc(doc(db,'pointslog',currentUser.uid+'_'+today));
     if(snap.exists()){
       const pts = snap.data().pts || 0;
       document.getElementById('s2').textContent = '+'+pts;
       const roster = snap.data().roster || [];
-      roster.forEach(saved=>{
-        const p = ra.find(r=>r.name===saved.name);
-        if(p) p.todayPts = saved.pts;
-      });
+      roster.forEach(saved=>{ const p = ra.find(r=>r.name===saved.name); if(p) p.todayPts = saved.pts; });
     }
-    // Load yesterday
     const ySnap = await getDoc(doc(db,'pointslog',currentUser.uid+'_'+yDate));
     if(ySnap.exists()){
       yesterdayPts = {};
@@ -763,31 +671,20 @@ async function loadTodayPoints(){
   }catch(e){}
 }
 
-let autoRefreshInterval = null;
-
 function startAutoRefresh(){
   stopAutoRefresh();
-  // Auto-refresh stats every 5 minutes during game hours (17h-01h ET)
   autoRefreshInterval = setInterval(async()=>{
     const hour = new Date().getHours();
-    if(hour >= 17 || hour < 1){
-      await loadMatches();
-    }
+    if(hour >= 17 || hour < 1) await loadMatches();
   }, 5 * 60 * 1000);
 }
-
-function stopAutoRefresh(){
-  if(autoRefreshInterval) clearInterval(autoRefreshInterval);
-  autoRefreshInterval = null;
-}
+function stopAutoRefresh(){ if(autoRefreshInterval) clearInterval(autoRefreshInterval); autoRefreshInterval = null; }
 
 async function loadDGs() {
   const s = await getDocs(collection(db, 'users'));
   dgs = [];
   s.forEach(d => dgs.push({...d.data(), id: d.id}));
-  // Load yesterday's points for each DG
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate()-1);
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
   const yDate = yesterday.toISOString().split('T')[0];
   for(const dg of dgs){
     try{
@@ -817,8 +714,6 @@ async function loadWV(){
 }
 async function saveWV(){try{await setDoc(doc(db,'config','waiver'),{players:wv});}catch(e){}}
 
-let tradesUnsubscribe = null;
-
 async function loadTrades(){
   try{
     const s=await getDocs(collection(db,'trades'));
@@ -828,21 +723,13 @@ async function loadTrades(){
 }
 
 function startTradesListener(){
-  if(tradesUnsubscribe) tradesUnsubscribe();
   if(!currentUser||isGuest) return;
-  const { onSnapshot, collection: col, query: q, where } = window._fsExtras || {};
-  // Use polling every 30s as fallback since onSnapshot needs extra import
   setInterval(async()=>{
     const prevCount = trades.filter(t=>t.status==='pending'&&t.toUid===currentUser.uid).length;
     await loadTrades();
     const newCount = trades.filter(t=>t.status==='pending'&&t.toUid===currentUser.uid).length;
-    if(newCount > prevCount){
-      renderTrades();
-      // Flash notification
-      notify('🏒 Nouveau trade reçu! Vérifie tes trades.');
-    } else {
-      updateTradeBadge();
-    }
+    if(newCount > prevCount){ renderTrades(); notify('🏒 Nouveau trade recu!'); }
+    else { updateTradeBadge(); }
   }, 30000);
 }
 
@@ -857,25 +744,17 @@ function render(){
 }
 
 const ROSTER_LIMITS = {forwards:12, defense:6, goalies:2};
-
 function getRosterCounts(){
   let f=0,d=0,g=0;
-  ra.forEach(p=>{
-    if(p.status!=='active') return;
-    if(p.pos==='G') g++;
-    else if(p.pos==='D') d++;
-    else f++;
-  });
+  ra.forEach(p=>{ if(p.status!=='active') return; if(p.pos==='G') g++; else if(p.pos==='D') d++; else f++; });
   return {forwards:f, defense:d, goalies:g};
 }
-
 function isRosterPosMaxed(pos){
   const c=getRosterCounts();
   if(pos==='G') return c.goalies>=ROSTER_LIMITS.goalies;
   if(pos==='D') return c.defense>=ROSTER_LIMITS.defense;
   return c.forwards>=ROSTER_LIMITS.forwards;
 }
-
 function renderRosterPosBar(){
   const c=getRosterCounts();
   const bar=document.getElementById('rosterPosBar');
@@ -884,7 +763,7 @@ function renderRosterPosBar(){
     const full=cur>=max;
     const bg=full?'rgba(239,68,68,0.15)':'rgba(255,255,255,0.05)';
     const col=full?'var(--red)':cur>=max-1?'var(--gold)':'var(--text2)';
-    return `<span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;background:${bg};color:${col};border:1px solid ${full?'rgba(239,68,68,0.3)':'var(--border)'};">${label}: ${cur}/${max}${full?' MAX':''}</span>`;
+    return '<span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:6px;background:'+bg+';color:'+col+';border:1px solid '+(full?'rgba(239,68,68,0.3)':'var(--border)')+';">'+label+': '+cur+'/'+max+(full?' MAX':'')+'</span>';
   };
   bar.innerHTML=mk('ATT',c.forwards,ROSTER_LIMITS.forwards)+mk('DEF',c.defense,ROSTER_LIMITS.defense)+mk('GOAL',c.goalies,ROSTER_LIMITS.goalies);
 }
@@ -899,8 +778,6 @@ function updateStats(){
   document.getElementById('s3').textContent=ra.length;
   document.getElementById('s4').textContent=rr.length;
   renderRosterPosBar();
-
-  // Notice lecture seule
   if(!viewingOwnTeam || isGuest){
     document.getElementById('readonlyNotice').classList.remove('hidden');
     document.getElementById('readonlyName').textContent=dg.name||'ce DG';
@@ -914,12 +791,7 @@ function renderDGs(){
     const c=COLORS[d.color??i%10];
     const ini=(d.name||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
     const isMe=currentUser&&d.id===currentUser.uid;
-    return `<div class="dgcard ${d.id===activeDgId?'active':''} ${isMe?'mine':''}" onclick="selDG('${d.id}','${d.name||''}')">
-      <span class="dgrank ${i===0?'top':''}">${i+1}</span>
-      <div class="dgav" style="background:${c}22;color:${c}">${ini}</div>
-      <div class="dginfo"><div class="dgname">${d.name||'—'}</div><div class="dgpts">${d.pts||0} pts • +${d.today||0} auj.</div></div>
-      ${isMe?'<span class="you-badge">Moi</span>':''}
-    </div>`;
+    return '<div class="dgcard '+(d.id===activeDgId?'active':'')+' '+(isMe?'mine':'')+'" onclick="selDG(\''+d.id+'\',\''+( d.name||'').replace(/'/g,'')+'\')"><span class="dgrank '+(i===0?'top':'')+'">'+( i+1)+'</span><div class="dgav" style="background:'+c+'22;color:'+c+'">'+ini+'</div><div class="dginfo"><div class="dgname">'+(d.name||'—')+'</div><div class="dgpts">'+(d.pts||0)+' pts • +'+(d.today||0)+' auj.</div></div>'+(isMe?'<span class="you-badge">Moi</span>':'')+'</div>';
   }).join('');
 }
 
@@ -928,35 +800,13 @@ function renderRoster(){
   document.getElementById('ra').innerHTML=ra.length?ra.map((p,i)=>{
     const sc=p.status==='active'?'sa':p.status==='ir'?'si':'sr';
     const tc=p.todayPts>0?'color:var(--gold);font-weight:700':'color:var(--text3)';
-    return `<tr>
-      <td><div class="pn">${p.num}</div></td>
-      <td><div class="pc"><div class="sd ${sc}"></div><span style="font-weight:600">${p.name}</span></div></td>
-      <td><span class="pos pos-${p.pos}">${p.pos}</span></td>
-      <td style="color:var(--text2);font-size:12px">${p.team}</td>
-      <td style="font-size:11px;color:${p.status==='ir'?'var(--red)':'var(--text2)'}">${p.status==='active'?'Actif':p.status==='ir'?'IR':'Réserve'}</td>
-      <td class="r" style="color:var(--text2);font-size:12px">${yesterdayPts[p.name]>0?yesterdayPts[p.name]:'—'}</td>
-      <td class="r" style="${tc}">${p.todayPts>0?'+'+p.todayPts:'—'}</td>
-      <td class="r" style="font-weight:700">${p.seasonPts}</td>
-      <td class="r"><button class="ab" onclick="mvRes(${i})" ${canEdit?'':'disabled'}>↓ Réserve</button></td>
-    </tr>`;
-  }).join(''):'<tr><td colspan="8" class="empty">Aucun joueur actif</td></tr>';
+    return '<tr><td><div class="pn">'+p.num+'</div></td><td><div class="pc"><div class="sd '+sc+'"></div><span style="font-weight:600">'+p.name+'</span></div></td><td><span class="pos pos-'+p.pos+'">'+p.pos+'</span></td><td style="color:var(--text2);font-size:12px">'+p.team+'</td><td style="font-size:11px;color:'+(p.status==='ir'?'var(--red)':'var(--text2)')+'">'+( p.status==='active'?'Actif':p.status==='ir'?'IR':'Reserve')+'</td><td class="r" style="color:var(--text2);font-size:12px">'+(yesterdayPts[p.name]>0?yesterdayPts[p.name]:'—')+'</td><td class="r" style="'+tc+'">'+(p.todayPts>0?'+'+p.todayPts:'—')+'</td><td class="r" style="font-weight:700">'+p.seasonPts+'</td><td class="r"><button class="ab" onclick="mvRes('+i+')" '+(canEdit?'':'disabled')+'>↓ Reserve</button></td></tr>';
+  }).join(''):'<tr><td colspan="9" class="empty">Aucun joueur actif</td></tr>';
 
   document.getElementById('rr').innerHTML=rr.length?rr.map((p,i)=>{
     const sc=p.status==='ir'?'si':'sr';
-    const canEdit2=viewingOwnTeam&&!isGuest;
-    return `<tr>
-      <td><div class="pn">${p.num}</div></td>
-      <td><div class="pc"><div class="sd ${sc}"></div><span style="font-weight:600">${p.name}</span></div></td>
-      <td><span class="pos pos-${p.pos}">${p.pos}</span></td>
-      <td style="color:var(--text2);font-size:12px">${p.team}</td>
-      <td style="font-size:11px;color:${p.status==='ir'?'var(--red)':'var(--text2)'}">${p.status==='ir'?'IR':'Réserve'}</td>
-      <td class="r" style="font-weight:700">${p.seasonPts}</td>
-      <td class="r" style="display:flex;gap:5px;justify-content:flex-end">
-        <button class="ab" onclick="mvAct(${i})" ${canEdit2?'':'disabled'}>↑ Actif</button>
-        <button class="ab danger" onclick="cutP(${i})" ${canEdit2?'':'disabled'}>✕ Couper</button>
-      </td>
-    </tr>`;
-  }).join(''):'<tr><td colspan="7" class="empty">Réserve vide</td></tr>';
+    return '<tr><td><div class="pn">'+p.num+'</div></td><td><div class="pc"><div class="sd '+sc+'"></div><span style="font-weight:600">'+p.name+'</span></div></td><td><span class="pos pos-'+p.pos+'">'+p.pos+'</span></td><td style="color:var(--text2);font-size:12px">'+p.team+'</td><td style="font-size:11px;color:'+(p.status==='ir'?'var(--red)':'var(--text2)')+'">'+( p.status==='ir'?'IR':'Reserve')+'</td><td class="r" style="font-weight:700">'+p.seasonPts+'</td><td class="r" style="display:flex;gap:5px;justify-content:flex-end"><button class="ab" onclick="mvAct('+i+')" '+(canEdit?'':'disabled')+'>↑ Actif</button><button class="ab danger" onclick="cutP('+i+')" '+(canEdit?'':'disabled')+'>✕ Couper</button></td></tr>';
+  }).join(''):'<tr><td colspan="7" class="empty">Reserve vide</td></tr>';
   updateStats();
 }
 
@@ -969,19 +819,7 @@ function renderClassement(){
     const ini=(d.name||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
     const pct=Math.round((d.pts/max)*100)||0;
     const isMe=currentUser&&d.id===currentUser.uid;
-    return `<tr style="${isMe?'background:rgba(200,16,46,0.05)':''}">
-      <td><span class="rn ${cls}">${i+1}</span></td>
-      <td><div style="display:flex;align-items:center;gap:8px">
-        <div class="dgav" style="background:${c}22;color:${c};width:29px;height:29px;font-size:10px">${ini}</div>
-        <div><div style="font-weight:600;font-size:13px">${d.team||'—'} ${isMe?'<span style="font-size:10px;color:var(--accent2)">← toi</span>':''}</div>
-        <div style="font-size:11px;color:var(--text2)">${d.name||'—'}</div>
-        <div class="pb"><div class="pbf" style="width:${pct}%"></div></div></div>
-      </div></td>
-      <td style="text-align:right;font-weight:800;font-size:15px">${d.pts||0}</td>
-      <td style="text-align:right;color:var(--gold);font-weight:700">+${d.today||0}</td>
-      <td style="text-align:right;color:var(--text2)">${d.yesterday||0}</td>
-      <td style="text-align:right;color:var(--text2)">${d.role==='admin'?'⚙ Comm.':'DG'}</td>
-    </tr>`;
+    return '<tr style="'+(isMe?'background:rgba(200,16,46,0.05)':'')+'"><td><span class="rn '+cls+'">'+(i+1)+'</span></td><td><div style="display:flex;align-items:center;gap:8px"><div class="dgav" style="background:'+c+'22;color:'+c+';width:29px;height:29px;font-size:10px">'+ini+'</div><div><div style="font-weight:600;font-size:13px">'+(d.team||'—')+(isMe?' <span style="font-size:10px;color:var(--accent2)">← toi</span>':'')+'</div><div style="font-size:11px;color:var(--text2)">'+(d.name||'—')+'</div><div class="pb"><div class="pbf" style="width:'+pct+'%"></div></div></div></div></td><td style="text-align:right;font-weight:800;font-size:15px">'+(d.pts||0)+'</td><td style="text-align:right;color:var(--gold);font-weight:700">+'+(d.today||0)+'</td><td style="text-align:right;color:var(--text2)">'+(d.yesterday||0)+'</td><td style="text-align:right;color:var(--text2)">'+(d.role==='admin'?'⚙ Comm.':'DG')+'</td></tr>';
   }).join('');
 }
 
@@ -990,79 +828,36 @@ function updateTradeBadge(){
   const myPending = trades.filter(t=>t.status==='pending' && t.toUid===currentUser.uid);
   const badge = document.getElementById('tradeBadge');
   if(!badge) return;
-  if(myPending.length > 0){
-    badge.textContent = myPending.length;
-    badge.style.display = 'inline';
-  } else {
-    badge.style.display = 'none';
-  }
+  if(myPending.length > 0){ badge.textContent = myPending.length; badge.style.display = 'inline'; }
+  else { badge.style.display = 'none'; }
 }
-
-window.clearTradeBadge = function(){
-  const badge = document.getElementById('tradeBadge');
-  if(badge) badge.style.display = 'none';
-};
+window.clearTradeBadge = function(){ const badge = document.getElementById('tradeBadge'); if(badge) badge.style.display = 'none'; };
 
 function renderTrades(){
   const pend=trades.filter(t=>t.status==='pending');
   const hist=trades.filter(t=>t.status!=='pending');
-  document.getElementById('trp').innerHTML=pend.length?pend.map(t=>`
-    <div class="tc"><div class="th2"><span style="font-size:11px;color:var(--text2)">${t.date||''}</span><span class="tbg p">En attente</span></div>
-    <div class="tf"><div class="ts"><div class="tdg2">${t.from} offre:</div><div class="tp">${(t.give||[]).join(', ')}</div></div>
-    <div class="ta2">⇄</div>
-    <div class="ts"><div class="tdg2">${t.to} offre:</div><div class="tp">${(t.receive||[]).join(', ')}</div></div></div>
-    <div class="tact">
-      <button class="btn btn-a" onclick="accTrade('${t.fid}')">✓ Accepter</button>
-      <button class="btn btn-r" onclick="refTrade('${t.fid}')">✕ Refuser</button>
-      <button class="btn btn-c" onclick="notify('Contre-offre — bientôt!')">↺ Contre-offre</button>
-    </div></div>`).join(''):'<div class="empty">Aucun trade en attente</div>';
-  document.getElementById('trh').innerHTML=hist.length?hist.slice(0,8).map(t=>`
-    <div class="tc"><div class="th2"><span style="font-size:11px;color:var(--text2)">${t.date||''}</span><span class="tbg ${t.status==='accepted'?'a':'r'}">${t.status==='accepted'?'Complété':'Refusé'}</span></div>
-    <div class="tf"><div class="ts"><div class="tdg2">${t.from}:</div><div class="tp">${(t.give||[]).join(', ')}</div></div>
-    <div class="ta2">⇄</div>
-    <div class="ts"><div class="tdg2">${t.to}:</div><div class="tp">${(t.receive||[]).join(', ')}</div></div></div></div>`).join(''):'<div class="empty">Aucun trade complété</div>';
+  document.getElementById('trp').innerHTML=pend.length?pend.map(t=>'<div class="tc"><div class="th2"><span style="font-size:11px;color:var(--text2)">'+(t.date||'')+'</span><span class="tbg p">En attente</span></div><div class="tf"><div class="ts"><div class="tdg2">'+t.from+' offre:</div><div class="tp">'+((t.give||[]).join(', '))+'</div></div><div class="ta2">⇄</div><div class="ts"><div class="tdg2">'+t.to+' offre:</div><div class="tp">'+((t.receive||[]).join(', '))+'</div></div></div><div class="tact"><button class="btn btn-a" onclick="accTrade(\''+t.fid+'\')">✓ Accepter</button><button class="btn btn-r" onclick="refTrade(\''+t.fid+'\')">✕ Refuser</button><button class="btn btn-c" onclick="notify(\'Contre-offre — bientot!\')">↺ Contre-offre</button></div></div>').join(''):'<div class="empty">Aucun trade en attente</div>';
+  document.getElementById('trh').innerHTML=hist.length?hist.slice(0,8).map(t=>'<div class="tc"><div class="th2"><span style="font-size:11px;color:var(--text2)">'+(t.date||'')+'</span><span class="tbg '+(t.status==='accepted'?'a':'r')+'">'+(t.status==='accepted'?'Complété':'Refusé')+'</span></div><div class="tf"><div class="ts"><div class="tdg2">'+t.from+':</div><div class="tp">'+((t.give||[]).join(', '))+'</div></div><div class="ta2">⇄</div><div class="ts"><div class="tdg2">'+t.to+':</div><div class="tp">'+((t.receive||[]).join(', '))+'</div></div></div></div>').join(''):'<div class="empty">Aucun trade complété</div>';
   updateTradeBadge();
 }
 
 function renderWV(){renderWVList(wv);}
 function renderWVList(pl){
   const canClaim=viewingOwnTeam&&!isGuest;
-  document.getElementById('wl').innerHTML=pl.length?pl.map(p=>`
-    <div class="wi"><span class="pos pos-${p.pos}">${p.pos}</span>
-    <div style="flex:1"><div style="font-weight:600;font-size:13px">${p.name}</div><div style="font-size:11px;color:var(--text2)">${p.team} • ${p.seasonPts} pts</div></div>
-    <button class="btn btn-p" style="font-size:11px;padding:5px 11px" onclick="claimWV('${p.name}')" ${canClaim?'':'disabled title="Connecte-toi pour réclamer"'}>Réclamer</button></div>`).join(''):'<div class="empty">Aucun joueur disponible</div>';
+  document.getElementById('wl').innerHTML=pl.length?pl.map(p=>'<div class="wi"><span class="pos pos-'+p.pos+'">'+p.pos+'</span><div style="flex:1"><div style="font-weight:600;font-size:13px">'+p.name+'</div><div style="font-size:11px;color:var(--text2)">'+p.team+' • '+p.seasonPts+' pts</div></div><button class="btn btn-p" style="font-size:11px;padding:5px 11px" onclick="claimWV(\''+p.name+'\')" '+(canClaim?'':'disabled')+'>Reclamer</button></div>').join(''):'<div class="empty">Aucun joueur disponible</div>';
 }
 
 function renderAdmin(){
-  document.getElementById('adgl').innerHTML=dgs.map(d=>`
-    <div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border)">
-      <span style="flex:1;font-size:13px">${d.name||'—'}</span>
-      <span style="font-size:10px;color:var(--text3)">${d.email||''}</span>
-    </div>`).join('');
-
-  document.getElementById('authUsers').innerHTML=dgs.map(d=>`
-    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
-      <span>${d.name||'—'}</span>
-      <span style="color:${d.role==='admin'?'var(--gold)':'var(--green)'}">● ${d.role==='admin'?'Admin':'Actif'}</span>
-    </div>`).join('');
-
-  document.getElementById('tlog').innerHTML=txlog.slice(0,15).map(t=>
-    `<div style="padding:6px 9px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text2)">${t.date} — ${t.msg}</div>`
-  ).join('')||'<div class="empty">Aucune transaction</div>';
+  document.getElementById('adgl').innerHTML=dgs.map(d=>{
+    const isMe=currentUser&&d.id===currentUser.uid;
+    return '<div style="display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid var(--border)"><div style="flex:1;"><div style="font-size:13px;font-weight:600;">'+(d.name||'—')+(isMe?' <span style="font-size:10px;color:var(--accent2)">(moi)</span>':'')+'</div><div style="font-size:10px;color:var(--text3);">'+(d.email||'')+'</div></div><button class="ab" style="font-size:11px;" onclick="openAdminRoster(\''+d.id+'\')">📋 Roster</button></div>';
+  }).join('');
+  document.getElementById('authUsers').innerHTML=dgs.map(d=>'<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>'+(d.name||'—')+'</span><span style="color:'+(d.role==='admin'?'var(--gold)':'var(--green)')+'">● '+(d.role==='admin'?'Admin':'Actif')+'</span></div>').join('');
+  document.getElementById('tlog').innerHTML=txlog.slice(0,15).map(t=>'<div style="padding:6px 9px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text2)">'+t.date+' — '+t.msg+'</div>').join('')||'<div class="empty">Aucune transaction</div>';
 }
 
-// NHL TEAM CODE MAP
-const NHL_TEAMS={
-  'ANA':'Ducks','ARI':'Coyotes','BOS':'Bruins','BUF':'Sabres','CGY':'Flames',
-  'CAR':'Hurricanes','CHI':'Blackhawks','COL':'Avalanche','CBJ':'Blue Jackets',
-  'DAL':'Stars','DET':'Red Wings','EDM':'Oilers','FLA':'Panthers','LAK':'Kings',
-  'MIN':'Wild','MTL':'Canadiens','NSH':'Predators','NJD':'Devils','NYI':'Islanders',
-  'NYR':'Rangers','OTT':'Senators','PHI':'Flyers','PIT':'Penguins','SEA':'Kraken',
-  'SJS':'Sharks','STL':'Blues','TBL':'Lightning','TOR':'Maple Leafs','VAN':'Canucks',
-  'VGK':'Golden Knights','WSH':'Capitals','WPG':'Jets','UTA':'Hockey Club'
-};
-
-let nhlGamesCache=[], nhlStatsCache={}, lastNhlFetch=0;
+const NHL_TEAMS={'ANA':'Ducks','BOS':'Bruins','BUF':'Sabres','CGY':'Flames','CAR':'Hurricanes','CHI':'Blackhawks','COL':'Avalanche','CBJ':'Blue Jackets','DAL':'Stars','DET':'Red Wings','EDM':'Oilers','FLA':'Panthers','LAK':'Kings','MIN':'Wild','MTL':'Canadiens','NSH':'Predators','NJD':'Devils','NYI':'Islanders','NYR':'Rangers','OTT':'Senators','PHI':'Flyers','PIT':'Penguins','SEA':'Kraken','SJS':'Sharks','STL':'Blues','TBL':'Lightning','TOR':'Maple Leafs','VAN':'Canucks','VGK':'Golden Knights','WSH':'Capitals','WPG':'Jets','UTA':'Hockey Club'};
+let nhlGamesCache=[], nhlStatsCache={};
 
 async function loadMatches(){
   document.getElementById('mdate').textContent=new Date().toLocaleDateString('fr-CA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -1070,15 +865,9 @@ async function loadMatches(){
   stopAutoRefresh(); startAutoRefresh();
   try {
     const today=new Date().toISOString().split('T')[0];
-    // Try multiple proxies
     let d = null;
-    const proxies = [
-      url => 'https://api.allorigins.win/raw?url='+encodeURIComponent(url),
-      url => 'https://corsproxy.io/?'+encodeURIComponent(url),
-      url => 'https://thingproxy.freeboard.io/fetch/'+url,
-    ];
     const nhlUrl = 'https://api-web.nhle.com/v1/score/'+today;
-    for(const makeProxy of proxies){
+    for(const makeProxy of [u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u), u=>'https://corsproxy.io/?'+encodeURIComponent(u)]){
       try{
         const r = await fetch(makeProxy(nhlUrl));
         if(!r.ok) continue;
@@ -1091,10 +880,7 @@ async function loadMatches(){
     if(!d) throw new Error('API non disponible');
     const games=d.games||[];
     nhlGamesCache=games;
-    if(!games.length){
-      document.getElementById('mgrid').innerHTML='<div class="empty">Aucun match aujourd\'hui</div>';
-      return;
-    }
+    if(!games.length){ document.getElementById('mgrid').innerHTML='<div class="empty">Aucun match aujourd\'hui</div>'; return; }
     document.getElementById('mgrid').innerHTML=games.map(g=>{
       const away=g.awayTeam?.abbrev||'?';
       const home=g.homeTeam?.abbrev||'?';
@@ -1103,33 +889,16 @@ async function loadMatches(){
       const state=g.gameState||'';
       let status='', cls='soon';
       if(state==='OFF'||state==='FINAL'){status='Final';cls='final';}
-      else if(state==='LIVE'||state==='CRIT'){
-        const p=g.periodDescriptor?.number||1;
-        const pName=p===1?'1re':p===2?'2e':p===3?'3e':'Pr.';
-        const clock=g.clock?.timeRemaining||'';
-        status='● '+pName+' — '+clock;cls='live';
-      }
-      else if(state==='PRE'||state==='FUT'){
-        const t=g.startTimeUTC?new Date(g.startTimeUTC).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit',timeZone:'America/Toronto'}):'—';
-        status=t;cls='soon';
-      }
+      else if(state==='LIVE'||state==='CRIT'){const p=g.periodDescriptor?.number||1;const pName=p===1?'1re':p===2?'2e':p===3?'3e':'Pr.';const clock=g.clock?.timeRemaining||'';status='● '+pName+' — '+clock;cls='live';}
+      else if(state==='PRE'||state==='FUT'){const t=g.startTimeUTC?new Date(g.startTimeUTC).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit',timeZone:'America/Toronto'}):'—';status=t;cls='soon';}
       else{status=state;cls='soon';}
-      const scoreStr=(state==='PRE'||state==='FUT')?'–':`${awayScore}–${homeScore}`;
-      return `<div class="mcard" onclick="fetchGameStats('${g.id}')">
-        <div class="mteams"><span>${away}</span><span class="mscore">${scoreStr}</span><span>${home}</span></div>
-        <div class="mstatus ${cls}">${status}</div>
-      </div>`;
+      const scoreStr=(state==='PRE'||state==='FUT')?'–':(awayScore+'–'+homeScore);
+      return '<div class="mcard" onclick="fetchGameStats(\''+g.id+'\')"><div class="mteams"><span>'+away+'</span><span class="mscore">'+scoreStr+'</span><span>'+home+'</span></div><div class="mstatus '+cls+'">'+status+'</div></div>';
     }).join('');
-    // Auto-fetch stats for active/finished games
     const activeGames=games.filter(g=>g.gameState==='OFF'||g.gameState==='FINAL'||g.gameState==='LIVE'||g.gameState==='CRIT');
     if(activeGames.length) await fetchAllStats(activeGames.map(g=>g.id));
   } catch(e) {
-    // Fallback to demo data
-    document.getElementById('mgrid').innerHTML=MATCHES.map(m=>{
-      const live=!['Final','19h00','20h00'].includes(m.st);
-      const cls=m.st==='Final'?'final':m.st.includes('h')?'soon':'live';
-      return `<div class="mcard"><div class="mteams"><span>${m.away}</span><span class="mscore">${m.as}–${m.hs}</span><span>${m.home}</span></div><div class="mstatus ${cls}">${live?'● ':''}${m.st}</div></div>`;
-    }).join('');
+    document.getElementById('mgrid').innerHTML=MATCHES.map(m=>{const live=!['Final','19h00','20h00'].includes(m.st);const cls=m.st==='Final'?'final':m.st.includes('h')?'soon':'live';return '<div class="mcard"><div class="mteams"><span>'+m.away+'</span><span class="mscore">'+m.as+'–'+m.hs+'</span><span>'+m.home+'</span></div><div class="mstatus '+cls+'">'+(live?'● ':'')+m.st+'</div></div>';}).join('');
   }
 }
 
@@ -1138,21 +907,10 @@ async function fetchAllStats(gameIds){
     try{
       const boxUrl = 'https://api-web.nhle.com/v1/gamecenter/'+id+'/boxscore';
       let d = null;
-      for(const makeProxy of [
-        url=>'https://corsproxy.io/?'+encodeURIComponent(url),
-        url=>'https://api.allorigins.win/get?url='+encodeURIComponent(url),
-      ]){
-        try{
-          const r=await fetch(makeProxy(boxUrl));
-          if(!r.ok) continue;
-          const text2=await r.text();
-          try{ d=JSON.parse(text2); }catch(e4){ continue; }
-          if(d&&d.playerByGameStats) break;
-          d=null;
-        }catch(e3){continue;}
+      for(const makeProxy of [u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u), u=>'https://corsproxy.io/?'+encodeURIComponent(u)]){
+        try{ const r=await fetch(makeProxy(boxUrl)); if(!r.ok) continue; const t2=await r.text(); try{d=JSON.parse(t2);}catch(e4){continue;} if(d&&d.playerByGameStats) break; d=null; }catch(e3){continue;}
       }
       if(!d) continue;
-      // Extract player stats from both teams
       const teams=[d.playerByGameStats?.homeTeam, d.playerByGameStats?.awayTeam].filter(Boolean);
       teams.forEach(team=>{
         ['forwards','defense','goalies'].forEach(pos=>{
@@ -1160,37 +918,19 @@ async function fetchAllStats(gameIds){
             const name=(p.name?.default||'').trim();
             if(!name) return;
             if(!nhlStatsCache[name]) nhlStatsCache[name]={goals:0,assists:0,wins:0,shutouts:0};
-            if(pos==='goalies'){
-              const won=p.decision==='W';
-              const so=(p.shotsAgainst||0)>0&&(p.goalsAgainst||0)===0&&won;
-              nhlStatsCache[name].wins+=(won?1:0);
-              nhlStatsCache[name].shutouts+=(so?1:0);
-            } else {
-              nhlStatsCache[name].goals+=(p.goals||0);
-              nhlStatsCache[name].assists+=(p.assists||0);
-            }
+            if(pos==='goalies'){ const won=p.decision==='W'; const so=(p.shotsAgainst||0)>0&&(p.goalsAgainst||0)===0&&won; nhlStatsCache[name].wins+=(won?1:0); nhlStatsCache[name].shutouts+=(so?1:0); }
+            else { nhlStatsCache[name].goals+=(p.goals||0); nhlStatsCache[name].assists+=(p.assists||0); }
           });
         });
       });
     }catch(e2){}
   }
-  // Update todayPts for active roster
   let totalToday=0;
-  ra.forEach(p=>{
-    const stats=nhlStatsCache[p.name];
-    if(stats && p.status==='active'){
-      if(p.pos==='G'){
-        p.todayPts=(stats.wins||0)+(stats.shutouts?2:0); // 1 win + 2 bonus for SO = 3 total
-      } else {
-        p.todayPts=(stats.goals||0)+(stats.assists||0);
-      }
-      totalToday+=p.todayPts;
-    }
-  });
+  ra.forEach(p=>{ const stats=nhlStatsCache[p.name]; if(stats && p.status==='active'){ if(p.pos==='G'){ p.todayPts=(stats.wins||0)+(stats.shutouts?2:0); } else { p.todayPts=(stats.goals||0)+(stats.assists||0); } totalToday+=p.todayPts; } });
   renderRoster();
   document.getElementById('s2').textContent='+'+totalToday;
   await savePointsToFirebase(totalToday);
-  notify('Stats LNH mises à jour — '+Object.keys(nhlStatsCache).length+' joueurs chargés');
+  notify('Stats LNH mises a jour — '+Object.keys(nhlStatsCache).length+' joueurs charges');
 }
 
 async function savePointsToFirebase(totalToday){
@@ -1212,10 +952,7 @@ async function savePointsToFirebase(totalToday){
   }catch(e){console.error('Erreur sauvegarde points:',e);}
 }
 
-window.fetchGameStats=async function(gameId){
-  notify('Chargement du match...');
-  await fetchAllStats([gameId]);
-};
+window.fetchGameStats=async function(gameId){ notify('Chargement du match...'); await fetchAllStats([gameId]); };
 
 function showApp(){
   document.getElementById('lov').classList.add('hidden');
@@ -1226,7 +963,6 @@ function showApp(){
   startChatPolling();
 }
 
-// ACTIONS
 window.signInEmail = async function(){
   const email = document.getElementById('loginEmail').value;
   const password = document.getElementById('loginPassword').value;
@@ -1246,99 +982,65 @@ window.signUpEmail = async function(){
   const password = document.getElementById('loginPassword').value;
   document.getElementById('loginError').textContent = '';
   if(!email||!password){document.getElementById('loginError').textContent='Email et mot de passe requis';return;}
-  if(password.length<6){document.getElementById('loginError').textContent='Mot de passe minimum 6 caractères';return;}
+  if(password.length<6){document.getElementById('loginError').textContent='Mot de passe minimum 6 caracteres';return;}
   try{
     const { createUserWithEmailAndPassword, updateProfile } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js');
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, {displayName: email.split('@')[0]});
   }catch(e){
-    const msgs={'auth/email-already-in-use':'Ce compte existe déjà — utilise Se connecter','auth/weak-password':'Mot de passe trop faible','auth/invalid-email':'Email invalide'};
+    const msgs={'auth/email-already-in-use':'Ce compte existe deja','auth/weak-password':'Mot de passe trop faible','auth/invalid-email':'Email invalide'};
     document.getElementById('loginError').textContent = msgs[e.code]||e.message;
   }
 };
 
 window.signInGoogle = async function(){
-  try{
-    const provider=new GoogleAuthProvider();
-    await signInWithPopup(auth,provider);
-  }catch(e){
-    notify('Erreur connexion: '+e.message);
-  }
+  try{ const provider=new GoogleAuthProvider(); await signInWithPopup(auth,provider); }
+  catch(e){ notify('Erreur connexion: '+e.message); }
 };
 
 window.signInGuest = function(){
-  isGuest=true;
-  activeDgId=null;
-  viewingOwnTeam=false;
+  isGuest=true; activeDgId=null; viewingOwnTeam=false;
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('lov').classList.remove('hidden');
   document.getElementById('lovText').textContent='Chargement en mode lecture...';
   document.getElementById('userName').textContent='Visiteur';
   document.getElementById('userRole').textContent='Lecture seule';
-  loadAll().then(()=>{
-    if(dgs.length>0){activeDgId=dgs[0].id;loadRoster(dgs[0].id).then(()=>{renderRoster();updateStats();});}
-    showApp();
-  });
+  loadAll().then(()=>{ if(dgs.length>0){activeDgId=dgs[0].id;loadRoster(dgs[0].id).then(()=>{renderRoster();updateStats();});} showApp(); });
 };
 
 window.signOut = async function(){
-  if(isGuest){
-    isGuest=false;currentUser=null;
-    document.getElementById('app').classList.add('hidden');
-    document.getElementById('loginScreen').classList.remove('hidden');
-    return;
-  }
+  if(isGuest){ isGuest=false;currentUser=null; document.getElementById('app').classList.add('hidden'); document.getElementById('loginScreen').classList.remove('hidden'); return; }
   try{await fbSignOut(auth);}catch(e){}
 };
 
 window.selDG = async function(id, name){
-  activeDgId=id;
-  viewingOwnTeam = currentUser && id===currentUser.uid;
-  renderDGs();
-  await loadRoster(id);
-  renderRoster();updateStats();
+  activeDgId=id; viewingOwnTeam = currentUser && id===currentUser.uid;
+  renderDGs(); await loadRoster(id); renderRoster(); updateStats();
 };
 
 window.mvRes=async function(i){
-  if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton équipe');return;}
-  if(rr.length>=10){notify('Réserve pleine');return;}
+  if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton equipe');return;}
+  if(rr.length>=10){notify('Reserve pleine');return;}
   const p=ra.splice(i,1)[0];p.status='reserve';rr.push(p);
-  renderRoster();await saveRoster();notify(p.name+' → réserve');
+  renderRoster();await saveRoster();notify(p.name+' → reserve');
 };
 
 window.mvAct=async function(i){
-  if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton équipe');return;}
+  if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton equipe');return;}
   const playerToUp = rr[i];
-  // Check position limit first
   if(isRosterPosMaxed(playerToUp.pos) && ra.length<20){
-    const posName = playerToUp.pos==='G'?'gardiens':playerToUp.pos==='D'?'défenseurs':'attaquants';
+    const posName = playerToUp.pos==='G'?'gardiens':playerToUp.pos==='D'?'defenseurs':'attaquants';
     const maxVal = playerToUp.pos==='G'?ROSTER_LIMITS.goalies:playerToUp.pos==='D'?ROSTER_LIMITS.defense:ROSTER_LIMITS.forwards;
-    notify('Maximum de '+maxVal+' '+posName+' dans le lineup actif atteint — descends-en un dabord');
+    notify('Maximum de '+maxVal+' '+posName+' atteint — descends-en un dabord');
     return;
   }
   if(ra.length>=20){
-    // Show swap modal
     document.getElementById('swapTitle').textContent='Monter '+playerToUp.name+' — qui descend?';
-    // Filter by same position group
     const isForward = ['C','LW','RW'].includes(playerToUp.pos);
     const isDefense = playerToUp.pos === 'D';
-    const isGoalie = playerToUp.pos === 'G';
-    const eligible = ra.map((p,j)=>({p,j})).filter(({p})=>{
-      if(isForward) return ['C','LW','RW'].includes(p.pos);
-      if(isDefense) return p.pos === 'D';
-      if(isGoalie) return p.pos === 'G';
-      return true;
-    });
-    const posLabel = isForward?'attaquant':isDefense?'défenseur':'gardien';
-    document.getElementById('swapList').innerHTML = eligible.length ? eligible.map(({p,j})=>`
-      <div class="swap-player" onclick="doSwap(${i},${j})">
-        <span class="pos pos-${p.pos}" style="font-size:9px;padding:1px 5px;">${p.pos}</span>
-        <div style="flex:1;">
-          <div style="font-weight:600;font-size:13px;">${p.name}</div>
-          <div style="font-size:11px;color:var(--text2);">${p.team} • ${p.seasonPts} pts saison</div>
-        </div>
-        <span style="font-size:11px;color:var(--accent2);">↓ Réserve</span>
-      </div>`).join('') : '<div class="empty">Aucun '+posLabel+' actif à descendre</div>';
+    const eligible = ra.map((p,j)=>({p,j})).filter(({p})=>{ if(isForward) return ['C','LW','RW'].includes(p.pos); if(isDefense) return p.pos === 'D'; return p.pos === 'G'; });
+    const posLabel = isForward?'attaquant':isDefense?'defenseur':'gardien';
+    document.getElementById('swapList').innerHTML = eligible.length ? eligible.map(({p,j})=>'<div class="swap-player" onclick="doSwap('+i+','+j+')"><span class="pos pos-'+p.pos+'" style="font-size:9px;padding:1px 5px;">'+p.pos+'</span><div style="flex:1;"><div style="font-weight:600;font-size:13px;">'+p.name+'</div><div style="font-size:11px;color:var(--text2);">'+p.team+' • '+p.seasonPts+' pts saison</div></div><span style="font-size:11px;color:var(--accent2);">↓ Reserve</span></div>').join('') : '<div class="empty">Aucun '+posLabel+' actif a descendre</div>';
     document.getElementById('swapModal').classList.remove('hidden');
     return;
   }
@@ -1353,38 +1055,37 @@ window.doSwap=async function(reserveIdx, actifIdx){
   goUp.status='active'; goDown.status='reserve';
   ra.push(goUp); rr.push(goDown);
   renderRoster(); await saveRoster();
-  notify(goUp.name+' → actif | '+goDown.name+' → réserve');
+  notify(goUp.name+' → actif | '+goDown.name+' → reserve');
 };
 
 window.cutP=async function(i){
-  if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton équipe');return;}
+  if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton equipe');return;}
   const p=rr[i];
   if(!confirm('Couper '+p.name+'?'))return;
   rr.splice(i,1);wv.unshift({num:p.num,name:p.name,team:p.team,pos:p.pos,seasonPts:p.seasonPts});
   renderRoster();renderWV();await saveRoster();await saveWV();
   const dg=dgs.find(d=>d.id===currentUser?.uid);
-  await logTx((dg?.name||'Un DG')+' a coupé '+p.name+' → waiver');
-  notify(p.name+' coupé — waiver wire');
+  await logTx((dg?.name||'Un DG')+' a coupe '+p.name+' → waiver');
+  notify(p.name+' coupe — waiver wire');
 };
 
 window.claimWV=async function(name){
-  if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton équipe');return;}
-  if(rr.length>=10){notify('Réserve pleine');return;}
+  if(!viewingOwnTeam||isGuest){notify('Tu peux seulement modifier ton equipe');return;}
+  if(rr.length>=10){notify('Reserve pleine');return;}
   const idx=wv.findIndex(p=>p.name===name);if(idx===-1)return;
   const p=wv.splice(idx,1)[0];p.status='reserve';p.todayPts=0;rr.push(p);
   renderRoster();renderWV();await saveRoster();await saveWV();
   const dg=dgs.find(d=>d.id===currentUser?.uid);
-  await logTx((dg?.name||'Un DG')+' a réclamé '+name+' (waiver)');
-  notify(name+' ajouté à ta réserve!');
+  await logTx((dg?.name||'Un DG')+' a reclame '+name+' (waiver)');
+  notify(name+' ajoute a ta reserve!');
 };
 
 window.accTrade=async function(fid){
-  try{await setDoc(doc(db,'trades',fid),{status:'accepted'},{merge:true});await logTx('Trade accepté');await loadTrades();renderTrades();notify('Trade accepté!');}
+  try{await setDoc(doc(db,'trades',fid),{status:'accepted'},{merge:true});await logTx('Trade accepte');await loadTrades();renderTrades();notify('Trade accepte!');}
   catch(e){notify('Erreur: '+e.message);}
 };
-
 window.refTrade=async function(fid){
-  try{await setDoc(doc(db,'trades',fid),{status:'refused'},{merge:true});await loadTrades();renderTrades();notify('Trade refusé.');}
+  try{await setDoc(doc(db,'trades',fid),{status:'refused'},{merge:true});await loadTrades();renderTrades();notify('Trade refuse.');}
   catch(e){notify('Erreur: '+e.message);}
 };
 
@@ -1397,7 +1098,6 @@ window.showTradeModal=function(){
   document.getElementById('tradeEmpty').style.display='block';
   selectedTradeDG=null;selectedGive=[];selectedReceive=[];selectedGivePicks=[];selectedReceivePicks=[];
 };
-
 window.closeTradeModal=function(){document.getElementById('tradeModal').classList.add('hidden');};
 
 let selectedTradeDG=null,selectedGive=[],selectedReceive=[],selectedGivePicks=[],selectedReceivePicks=[];
@@ -1405,9 +1105,7 @@ let theirRoster=[];
 
 function renderTradeDGSelector(){
   const others=dgs.filter(d=>currentUser&&d.id!==currentUser.uid);
-  document.getElementById('tradeDgSelector').innerHTML=others.length?others.map(d=>`
-    <button class="dg-sel-btn ${selectedTradeDG===d.id?'active':''}" onclick="selectTradeDG('${d.id}')">${d.name||d.email||'DG'}</button>
-  `).join(''):'<span style="color:var(--text3);font-size:13px;">Aucun autre DG enregistré pour l\'instant</span>';
+  document.getElementById('tradeDgSelector').innerHTML=others.length?others.map(d=>'<button class="dg-sel-btn '+(selectedTradeDG===d.id?'active':'')+'" onclick="selectTradeDG(\''+d.id+'\')">'+(d.name||d.email||'DG')+'</button>').join(''):'<span style="color:var(--text3);font-size:13px;">Aucun autre DG enregistre</span>';
 }
 
 window.selectTradeDG=async function(dgId){
@@ -1416,69 +1114,29 @@ window.selectTradeDG=async function(dgId){
   document.getElementById('tradeEmpty').style.display='none';
   document.getElementById('tradeCols').style.display='grid';
   document.getElementById('tradeSummary').style.display='none';
-  // Load their roster
-  try{
-    const s=await getDoc(doc(db,'rosters',dgId));
-    theirRoster=s.exists()?(s.data().actif||[]).concat(s.data().reserve||[]):[];
-  }catch{theirRoster=[];}
-  renderTradeRosters();
-  renderTradePicks();
+  try{ const s=await getDoc(doc(db,'rosters',dgId)); theirRoster=s.exists()?(s.data().actif||[]).concat(s.data().reserve||[]):[];}catch{theirRoster=[];}
+  renderTradeRosters(); renderTradePicks();
 };
 
 function renderTradeRosters(){
   const myAll=[...ra,...rr];
-  document.getElementById('tradeMyRoster').innerHTML=myAll.map((p,i)=>`
-    <div class="trade-player ${selectedGive.includes(i)?'selected':''}" onclick="toggleGive(${i})">
-      <div class="trade-chk">${selectedGive.includes(i)?'✓':''}</div>
-      <span class="pos pos-${p.pos}" style="font-size:9px;padding:1px 5px;">${p.pos}</span>
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-        <div style="font-size:10px;color:var(--text2)">${p.team} • ${p.seasonPts} pts</div>
-      </div>
-    </div>`).join('')||'<div style="color:var(--text3);font-size:12px;padding:8px;">Roster vide</div>';
-
-  document.getElementById('tradeTheirRoster').innerHTML=theirRoster.map((p,i)=>`
-    <div class="trade-player ${selectedReceive.includes(i)?'selected-receive':''}" onclick="toggleReceive(${i})">
-      <div class="trade-chk">${selectedReceive.includes(i)?'✓':''}</div>
-      <span class="pos pos-${p.pos}" style="font-size:9px;padding:1px 5px;">${p.pos}</span>
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-        <div style="font-size:10px;color:var(--text2)">${p.team} • ${p.seasonPts} pts</div>
-      </div>
-    </div>`).join('')||'<div style="color:var(--text3);font-size:12px;padding:8px;">Roster vide</div>';
+  document.getElementById('tradeMyRoster').innerHTML=myAll.map((p,i)=>'<div class="trade-player '+(selectedGive.includes(i)?'selected':'')+'" onclick="toggleGive('+i+')"><div class="trade-chk">'+(selectedGive.includes(i)?'✓':'')+'</div><span class="pos pos-'+p.pos+'" style="font-size:9px;padding:1px 5px;">'+p.pos+'</span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:10px;color:var(--text2)">'+p.team+' • '+p.seasonPts+' pts</div></div></div>').join('')||'<div style="color:var(--text3);font-size:12px;padding:8px;">Roster vide</div>';
+  document.getElementById('tradeTheirRoster').innerHTML=theirRoster.map((p,i)=>'<div class="trade-player '+(selectedReceive.includes(i)?'selected-receive':'')+'" onclick="toggleReceive('+i+')"><div class="trade-chk">'+(selectedReceive.includes(i)?'✓':'')+'</div><span class="pos pos-'+p.pos+'" style="font-size:9px;padding:1px 5px;">'+p.pos+'</span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:10px;color:var(--text2)">'+p.team+' • '+p.seasonPts+' pts</div></div></div>').join('')||'<div style="color:var(--text3);font-size:12px;padding:8px;">Roster vide</div>';
 }
 
 function renderTradePicks(){
   const curYear=new Date().getFullYear(); const years=[curYear,curYear+1];
   const rounds=['1re ronde','2e ronde','3e ronde'];
   const myPicks=[];const theirPicks=[];
-  years.forEach(y=>rounds.forEach(r=>{myPicks.push(`${r} ${y}`);theirPicks.push(`${r} ${y}`);}));
-  document.getElementById('tradeMyPicks').innerHTML=myPicks.map(p=>`
-    <button class="pick-btn ${selectedGivePicks.includes(p)?'selected':''}" onclick="toggleGivePick('${p}')">${p}</button>`).join('');
-  document.getElementById('tradeTheirPicks').innerHTML=theirPicks.map(p=>`
-    <button class="pick-btn ${selectedReceivePicks.includes(p)?'selected-receive':''}" onclick="toggleReceivePick('${p}')">${p}</button>`).join('');
+  years.forEach(y=>rounds.forEach(r=>{myPicks.push(r+' '+y);theirPicks.push(r+' '+y);}));
+  document.getElementById('tradeMyPicks').innerHTML=myPicks.map(p=>'<button class="pick-btn '+(selectedGivePicks.includes(p)?'selected':'')+'" onclick="toggleGivePick(\''+p+'\')">'+p+'</button>').join('');
+  document.getElementById('tradeTheirPicks').innerHTML=theirPicks.map(p=>'<button class="pick-btn '+(selectedReceivePicks.includes(p)?'selected-receive':'')+'" onclick="toggleReceivePick(\''+p+'\')">'+p+'</button>').join('');
 }
 
-window.toggleGive=function(i){
-  const idx=selectedGive.indexOf(i);
-  if(idx===-1)selectedGive.push(i);else selectedGive.splice(idx,1);
-  renderTradeRosters();updateTradeSummary();
-};
-window.toggleReceive=function(i){
-  const idx=selectedReceive.indexOf(i);
-  if(idx===-1)selectedReceive.push(i);else selectedReceive.splice(idx,1);
-  renderTradeRosters();updateTradeSummary();
-};
-window.toggleGivePick=function(p){
-  const idx=selectedGivePicks.indexOf(p);
-  if(idx===-1)selectedGivePicks.push(p);else selectedGivePicks.splice(idx,1);
-  renderTradePicks();updateTradeSummary();
-};
-window.toggleReceivePick=function(p){
-  const idx=selectedReceivePicks.indexOf(p);
-  if(idx===-1)selectedReceivePicks.push(p);else selectedReceivePicks.splice(idx,1);
-  renderTradePicks();updateTradeSummary();
-};
+window.toggleGive=function(i){const idx=selectedGive.indexOf(i);if(idx===-1)selectedGive.push(i);else selectedGive.splice(idx,1);renderTradeRosters();updateTradeSummary();};
+window.toggleReceive=function(i){const idx=selectedReceive.indexOf(i);if(idx===-1)selectedReceive.push(i);else selectedReceive.splice(idx,1);renderTradeRosters();updateTradeSummary();};
+window.toggleGivePick=function(p){const idx=selectedGivePicks.indexOf(p);if(idx===-1)selectedGivePicks.push(p);else selectedGivePicks.splice(idx,1);renderTradePicks();updateTradeSummary();};
+window.toggleReceivePick=function(p){const idx=selectedReceivePicks.indexOf(p);if(idx===-1)selectedReceivePicks.push(p);else selectedReceivePicks.splice(idx,1);renderTradePicks();updateTradeSummary();};
 
 function updateTradeSummary(){
   const myAll=[...ra,...rr];
@@ -1495,11 +1153,7 @@ function updateTradeSummary(){
   document.getElementById('summaryWith').textContent=dg?.name||'—';
 }
 
-window.resetTradeForm=function(){
-  selectedGive=[];selectedReceive=[];selectedGivePicks=[];selectedReceivePicks=[];
-  renderTradeRosters();renderTradePicks();
-  document.getElementById('tradeSummary').style.display='none';
-};
+window.resetTradeForm=function(){selectedGive=[];selectedReceive=[];selectedGivePicks=[];selectedReceivePicks=[];renderTradeRosters();renderTradePicks();document.getElementById('tradeSummary').style.display='none';};
 
 window.submitTrade=async function(){
   const myAll=[...ra,...rr];
@@ -1507,711 +1161,423 @@ window.submitTrade=async function(){
   const receiveNames=selectedReceive.map(i=>theirRoster[i]?.name).filter(Boolean);
   const allGive=[...giveNames,...selectedGivePicks];
   const allReceive=[...receiveNames,...selectedReceivePicks];
-  if(!allGive.length&&!allReceive.length){notify('Sélectionne au moins un joueur ou choix de draft');return;}
+  if(!allGive.length&&!allReceive.length){notify('Selectionnez au moins un joueur ou choix de draft');return;}
   const meDG=dgs.find(d=>currentUser&&d.id===currentUser.uid);
   const themDG=dgs.find(d=>d.id===selectedTradeDG);
   try{
-    await addDoc(collection(db,'trades'),{
-      fromUid:currentUser.uid,
-      toUid:selectedTradeDG,
-      from:meDG?.name||currentUser.email,
-      to:themDG?.name||'—',
-      give:allGive,
-      receive:allReceive,
-      status:'pending',
-      date:new Date().toLocaleDateString('fr-CA'),
-      ts:serverTimestamp()
-    });
-    await logTx((meDG?.name||'Un DG')+' a proposé un trade à '+(themDG?.name||'—'));
-    closeTradeModal();
-    await loadTrades();
-    renderTrades();
-    showView('tr');
-    notify('Trade proposé! En attente de réponse.');
+    await addDoc(collection(db,'trades'),{fromUid:currentUser.uid,toUid:selectedTradeDG,from:meDG?.name||currentUser.email,to:themDG?.name||'—',give:allGive,receive:allReceive,status:'pending',date:new Date().toLocaleDateString('fr-CA'),ts:serverTimestamp()});
+    await logTx((meDG?.name||'Un DG')+' a propose un trade a '+(themDG?.name||'—'));
+    closeTradeModal();await loadTrades();renderTrades();showView('tr');
+    notify('Trade propose! En attente de reponse.');
   }catch(e){notify('Erreur: '+e.message);}
 };
-window.recalc=async function(){await loadDGs();renderClassement();renderDGs();notify('Points recalculés');};
-window.refreshW=async function(){await loadWV();renderWV();notify('Waiver actualisé');};
 
-// ========================
-// DRAFT SYSTEM
-// ========================
-
-// Full NHL player pool for draft
-const NHL_PLAYERS = [
-  // Centres
+// DRAFT
+const NHL_PLAYERS=[
   {name:'Connor McDavid',team:'EDM',pos:'C',rating:99},{name:'Nathan MacKinnon',team:'COL',pos:'C',rating:98},
-  {name:'Auston Matthews',team:'TOR',pos:'C',rating:97},{name:'Elias Pettersson',team:'VAN',pos:'C',rating:92},
-  {name:'Brayden Point',team:'TBL',pos:'C',rating:91},{name:'Tage Thompson',team:'BUF',pos:'C',rating:90},
-  {name:'Sebastian Aho',team:'CAR',pos:'C',rating:89},{name:'Anze Kopitar',team:'LAK',pos:'C',rating:87},
-  {name:'Ryan Nugent-Hopkins',team:'EDM',pos:'C',rating:86},{name:'Nick Suzuki',team:'MTL',pos:'C',rating:85},
-  {name:'Nazem Kadri',team:'CGY',pos:'C',rating:84},{name:'Dylan Larkin',team:'DET',pos:'C',rating:84},
-  {name:'Mikael Backstrom',team:'WSH',pos:'C',rating:83},{name:'Elias Lindholm',team:'BOS',pos:'C',rating:83},
-  {name:'Pierre-Luc Dubois',team:'WSH',pos:'C',rating:82},{name:'Wyatt Johnston',team:'DAL',pos:'C',rating:81},
-  {name:'Dylan Cozens',team:'BUF',pos:'C',rating:80},{name:'Shane Wright',team:'SEA',pos:'C',rating:78},
-  {name:'Marco Rossi',team:'MIN',pos:'C',rating:78},{name:'Logan Couture',team:'SJS',pos:'C',rating:77},
-  // Left Wings
-  {name:'Kirill Kaprizov',team:'MIN',pos:'LW',rating:96},{name:'Jason Robertson',team:'DAL',pos:'LW',rating:93},
-  {name:'Nikolaj Ehlers',team:'WPG',pos:'LW',rating:88},{name:'Brandon Hagel',team:'TBL',pos:'LW',rating:85},
-  {name:'Zach Hyman',team:'EDM',pos:'LW',rating:84},{name:'Tomas Hertl',team:'VGK',pos:'LW',rating:83},
-  {name:'Juraj Slafkovsky',team:'MTL',pos:'LW',rating:82},{name:'Filip Forsberg',team:'NSH',pos:'LW',rating:90},
-  {name:'Anthony Mantha',team:'WSH',pos:'LW',rating:79},{name:'Nino Niederreiter',team:'WPG',pos:'LW',rating:78},
-  {name:'Jake Guentzel',team:'TBL',pos:'LW',rating:88},{name:'Jonathan Drouin',team:'COL',pos:'LW',rating:77},
-  {name:'Chris Kreider',team:'NYR',pos:'LW',rating:85},{name:'Artemi Panarin',team:'NYR',pos:'LW',rating:94},
-  // Right Wings
+  {name:'Auston Matthews',team:'TOR',pos:'C',rating:97},{name:'Artemi Panarin',team:'NYR',pos:'LW',rating:94},
+  {name:'Quinn Hughes',team:'VAN',pos:'D',rating:94},{name:'Mikko Rantanen',team:'COL',pos:'RW',rating:95},
   {name:'David Pastrnak',team:'BOS',pos:'RW',rating:96},{name:'Cole Caufield',team:'MTL',pos:'RW',rating:93},
-  {name:'Mikko Rantanen',team:'COL',pos:'RW',rating:95},{name:'Patrick Kane',team:'DET',pos:'RW',rating:88},
-  {name:'Alex DeBrincat',team:'DET',pos:'RW',rating:87},{name:'Timo Meier',team:'NJD',pos:'RW',rating:86},
-  {name:'Rickard Rakell',team:'PIT',pos:'RW',rating:82},{name:'Claude Giroux',team:'OTT',pos:'RW',rating:83},
-  {name:'Brock Nelson',team:'NYI',pos:'RW',rating:82},{name:'William Nylander',team:'TOR',pos:'RW',rating:91},
-  {name:'Mark Scheifele',team:'WPG',pos:'RW',rating:88},{name:'Elias Pettersson',team:'CGY',pos:'RW',rating:80},
-  // Defensemen
-  {name:'Cale Makar',team:'COL',pos:'D',rating:99},{name:'Roman Josi',team:'NSH',pos:'D',rating:93},
-  {name:'Erik Karlsson',team:'PIT',pos:'D',rating:91},{name:'Evan Bouchard',team:'EDM',pos:'D',rating:88},
-  {name:'Quinn Hughes',team:'VAN',pos:'D',rating:94},{name:'Noah Dobson',team:'NYI',pos:'D',rating:86},
-  {name:'Jakob Chychrun',team:'WSH',pos:'D',rating:83},{name:'Rasmus Dahlin',team:'BUF',pos:'D',rating:92},
-  {name:'Miro Heiskanen',team:'DAL',pos:'D',rating:91},{name:'Devon Toews',team:'COL',pos:'D',rating:87},
-  {name:'Drew Doughty',team:'LAK',pos:'D',rating:85},{name:'Adam Fox',team:'NYR',pos:'D',rating:92},
-  {name:'Moritz Seider',team:'DET',pos:'D',rating:87},{name:'Samuel Girard',team:'COL',pos:'D',rating:82},
-  {name:'Connor Clifton',team:'BUF',pos:'D',rating:76},{name:'Darnell Nurse',team:'EDM',pos:'D',rating:82},
-  {name:'Alex Pietrangelo',team:'VGK',pos:'D',rating:84},{name:'Victor Hedman',team:'TBL',pos:'D',rating:90},
-  // Goalies
+  {name:'Cale Makar',team:'COL',pos:'D',rating:99},{name:'Igor Shesterkin',team:'NYR',pos:'G',rating:96},
   {name:'Connor Hellebuyck',team:'WPG',pos:'G',rating:97},{name:'Andrei Vasilevskiy',team:'TBL',pos:'G',rating:95},
-  {name:'Igor Shesterkin',team:'NYR',pos:'G',rating:96},{name:'Linus Ullmark',team:'OTT',pos:'G',rating:91},
-  {name:'Ilya Sorokin',team:'NYI',pos:'G',rating:90},{name:'Jake Oettinger',team:'DAL',pos:'G',rating:89},
-  {name:'Juuse Saros',team:'NSH',pos:'G',rating:88},{name:'Cam Talbot',team:'OTT',pos:'G',rating:82},
-  {name:'Stuart Skinner',team:'EDM',pos:'G',rating:84},{name:'Tristan Jarry',team:'PIT',pos:'G',rating:83},
-  {name:'Filip Gustavsson',team:'MIN',pos:'G',rating:87},{name:'Samuel Montembeault',team:'MTL',pos:'G',rating:82},
-  {name:'Mackenzie Blackwood',team:'SJS',pos:'G',rating:80},{name:'Jeremy Swayman',team:'BOS',pos:'G',rating:88},
+  {name:'Elias Pettersson',team:'VAN',pos:'C',rating:92},{name:'Rasmus Dahlin',team:'BUF',pos:'D',rating:92},
+  {name:'Adam Fox',team:'NYR',pos:'D',rating:92},{name:'Kirill Kaprizov',team:'MIN',pos:'LW',rating:96},
+  {name:'Jason Robertson',team:'DAL',pos:'LW',rating:93},{name:'William Nylander',team:'TOR',pos:'RW',rating:91},
+  {name:'Roman Josi',team:'NSH',pos:'D',rating:93},{name:'Brayden Point',team:'TBL',pos:'C',rating:91},
+  {name:'Tage Thompson',team:'BUF',pos:'C',rating:90},{name:'Filip Forsberg',team:'NSH',pos:'LW',rating:90},
+  {name:'Victor Hedman',team:'TBL',pos:'D',rating:90},{name:'Jake Oettinger',team:'DAL',pos:'G',rating:89},
+  {name:'Sebastian Aho',team:'CAR',pos:'C',rating:89},{name:'Linus Ullmark',team:'OTT',pos:'G',rating:91},
+  {name:'Jeremy Swayman',team:'BOS',pos:'G',rating:88},{name:'Evan Bouchard',team:'EDM',pos:'D',rating:88},
+  {name:'Erik Karlsson',team:'PIT',pos:'D',rating:91},{name:'Nick Suzuki',team:'MTL',pos:'C',rating:85},
+  {name:'Jake Guentzel',team:'TBL',pos:'LW',rating:88},{name:'Chris Kreider',team:'NYR',pos:'LW',rating:85},
+  {name:'Brandon Hagel',team:'TBL',pos:'LW',rating:85},{name:'Miro Heiskanen',team:'DAL',pos:'D',rating:91},
+  {name:'Filip Gustavsson',team:'MIN',pos:'G',rating:87},{name:'Alex DeBrincat',team:'DET',pos:'RW',rating:87},
+  {name:'Moritz Seider',team:'DET',pos:'D',rating:87},{name:'Timo Meier',team:'NJD',pos:'RW',rating:86},
+  {name:'Ryan Nugent-Hopkins',team:'EDM',pos:'C',rating:86},{name:'Devon Toews',team:'COL',pos:'D',rating:87},
+  {name:'Noah Dobson',team:'NYI',pos:'D',rating:86},{name:'Zach Hyman',team:'EDM',pos:'LW',rating:84},
+  {name:'Juuse Saros',team:'NSH',pos:'G',rating:88},{name:'Stuart Skinner',team:'EDM',pos:'G',rating:84},
+  {name:'Dylan Larkin',team:'DET',pos:'C',rating:84},{name:'Nazem Kadri',team:'CGY',pos:'C',rating:84},
+  {name:'Patrick Kane',team:'DET',pos:'RW',rating:88},{name:'Drew Doughty',team:'LAK',pos:'D',rating:85},
+  {name:'Alex Pietrangelo',team:'VGK',pos:'D',rating:84},{name:'Darnell Nurse',team:'EDM',pos:'D',rating:82},
+  {name:'Nikolaj Ehlers',team:'WPG',pos:'LW',rating:88},{name:'Tomas Hertl',team:'VGK',pos:'C',rating:83},
+  {name:'Juraj Slafkovsky',team:'MTL',pos:'LW',rating:82},{name:'Wyatt Johnston',team:'DAL',pos:'C',rating:81},
+  {name:'Dylan Cozens',team:'BUF',pos:'C',rating:80},{name:'Shane Wright',team:'SEA',pos:'C',rating:78},
+  {name:'Marco Rossi',team:'MIN',pos:'C',rating:78},{name:'Anthony Mantha',team:'WSH',pos:'LW',rating:79},
+  {name:'Nino Niederreiter',team:'WPG',pos:'LW',rating:78},{name:'Jonathan Drouin',team:'COL',pos:'LW',rating:77},
+  {name:'Anze Kopitar',team:'LAK',pos:'C',rating:87},{name:'Elias Lindholm',team:'BOS',pos:'C',rating:83},
+  {name:'Pierre-Luc Dubois',team:'WSH',pos:'C',rating:82},{name:'Brock Nelson',team:'NYI',pos:'RW',rating:82},
+  {name:'Claude Giroux',team:'OTT',pos:'RW',rating:83},{name:'Rickard Rakell',team:'PIT',pos:'RW',rating:82},
+  {name:'Samuel Girard',team:'COL',pos:'D',rating:82},{name:'Jakob Chychrun',team:'WSH',pos:'D',rating:83},
+  {name:'Connor Clifton',team:'BUF',pos:'D',rating:76},{name:'Samuel Montembeault',team:'MTL',pos:'G',rating:82},
+  {name:'Tristan Jarry',team:'PIT',pos:'G',rating:83},{name:'Cam Talbot',team:'OTT',pos:'G',rating:82},
+  {name:'Mackenzie Blackwood',team:'SJS',pos:'G',rating:80},{name:'Mark Scheifele',team:'WPG',pos:'RW',rating:88},
 ];
 
-let draftState = null;
-let draftOrder = [];
-let draftedPlayers = {};
-let draftTimerInterval = null;
-let draftTimeLeft = 0;
+let draftState=null, draftOrder=[], draftedPlayers={}, draftTimerInterval=null, draftTimeLeft=0;
 
-window.updateTimerLabel = function(){
-  const v = parseInt(document.getElementById('draftTimerRange').value);
-  document.getElementById('draftTimerLabel').textContent = v === 0 ? 'Aucun' : Math.floor(v/60)+':'+(v%60+'').padStart(2,'0');
-};
+window.updateTimerLabel=function(){const v=parseInt(document.getElementById('draftTimerRange').value);document.getElementById('draftTimerLabel').textContent=v===0?'Aucun':Math.floor(v/60)+':'+(v%60+'').padStart(2,'0');};
 
-window.openDraftModal = async function(){
-  if(!isAdmin){notify('Seulement le commissaire peut gérer le draft');return;}
+window.openDraftModal=async function(){
+  if(!isAdmin){notify('Seulement le commissaire');return;}
   document.getElementById('draftModal').classList.remove('hidden');
-  // Check if draft already exists
-  try{
-    const snap = await getDoc(doc(db,'draft','current'));
-    if(snap.exists() && snap.data().status === 'active'){
-      draftState = snap.data();
-      draftOrder = draftState.order || [];
-      draftedPlayers = draftState.drafted || {};
-      showDraftLive();
-    } else {
-      showDraftSetup();
-    }
-  }catch(e){ showDraftSetup(); }
+  try{const snap=await getDoc(doc(db,'draft','current'));if(snap.exists()&&snap.data().status==='active'){draftState=snap.data();draftOrder=draftState.order||[];draftedPlayers=draftState.drafted||{};showDraftLive();}else{showDraftSetup();}}catch(e){showDraftSetup();}
 };
 
-function showDraftSetup(){
-  document.getElementById('draftSetup').classList.remove('hidden');
-  document.getElementById('draftLive').classList.add('hidden');
-  document.getElementById('draftRoundInfo').textContent = 'Configuration';
-  document.getElementById('draftTurnBadge').textContent = 'Configuration';
-  document.getElementById('draftTurnBadge').className = 'draft-turn waiting';
-  renderDraftOrderSetup();
-}
+function showDraftSetup(){document.getElementById('draftSetup').classList.remove('hidden');document.getElementById('draftLive').classList.add('hidden');document.getElementById('draftRoundInfo').textContent='Configuration';document.getElementById('draftTurnBadge').textContent='Configuration';document.getElementById('draftTurnBadge').className='draft-turn waiting';renderDraftOrderSetup();}
 
 function renderDraftOrderSetup(){
-  const list = document.getElementById('draftOrderList');
-  if(!dgs.length){list.innerHTML='<div style="color:var(--text3);font-size:13px;">Aucun DG connecté</div>';return;}
-  // Init order if empty
-  if(!draftOrder.length) draftOrder = dgs.map(d=>d.id);
-  list.innerHTML = draftOrder.map((uid,i)=>{
-    const dg = dgs.find(d=>d.id===uid);
-    const c = COLORS[dg?.color??i%10];
-    const ini = (dg?.name||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
-    return `<div class="dg-order-row" draggable="true" data-uid="${uid}" 
-      ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropDG(event,${i})">
-      <div class="dg-order-num">${i+1}</div>
-      <div class="dgav" style="background:${c}22;color:${c};width:28px;height:28px;font-size:10px;">${ini}</div>
-      <span style="flex:1;font-size:13px;font-weight:600;">${dg?.name||uid}</span>
-      <span style="font-size:10px;color:var(--text3);">⠿ glisser</span>
-    </div>`;
-  }).join('');
+  const list=document.getElementById('draftOrderList');
+  if(!dgs.length){list.innerHTML='<div style="color:var(--text3);font-size:13px;">Aucun DG connecte</div>';return;}
+  if(!draftOrder.length) draftOrder=dgs.map(d=>d.id);
+  list.innerHTML=draftOrder.map((uid,i)=>{const dg=dgs.find(d=>d.id===uid);const c=COLORS[dg?.color??i%10];const ini=(dg?.name||'?').split(' ').map(n=>n[0]).join('').slice(0,2);return '<div class="dg-order-row" draggable="true" data-uid="'+uid+'" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="dropDG(event,'+i+')"><div class="dg-order-num">'+(i+1)+'</div><div class="dgav" style="background:'+c+'22;color:'+c+';width:28px;height:28px;font-size:10px;">'+ini+'</div><span style="flex:1;font-size:13px;font-weight:600;">'+(dg?.name||uid)+'</span><span style="font-size:10px;color:var(--text3);">⠿ glisser</span></div>';}).join('');
 }
 
-let dragIdx = -1;
-window.dragStart = function(e){ dragIdx = parseInt(e.currentTarget.getAttribute('data-uid') ? draftOrder.indexOf(e.currentTarget.dataset.uid) : -1); e.currentTarget.style.opacity='0.5'; };
-window.dragOver = function(e){ e.preventDefault(); };
-window.dropDG = function(e, toIdx){
-  e.preventDefault();
-  document.querySelectorAll('.dg-order-row').forEach(r=>r.style.opacity='1');
-  const fromUid = draftOrder[dragIdx];
-  if(dragIdx===-1||dragIdx===toIdx) return;
-  draftOrder.splice(dragIdx,1);
-  draftOrder.splice(toIdx,0,fromUid);
-  renderDraftOrderSetup();
-};
+let dragIdx=-1;
+window.dragStart=function(e){dragIdx=draftOrder.indexOf(e.currentTarget.dataset.uid);e.currentTarget.style.opacity='0.5';};
+window.dragOver=function(e){e.preventDefault();};
+window.dropDG=function(e,toIdx){e.preventDefault();document.querySelectorAll('.dg-order-row').forEach(r=>r.style.opacity='1');const fromUid=draftOrder[dragIdx];if(dragIdx===-1||dragIdx===toIdx)return;draftOrder.splice(dragIdx,1);draftOrder.splice(toIdx,0,fromUid);renderDraftOrderSetup();};
 
-window.startDraft = async function(){
+window.startDraft=async function(){
   if(!draftOrder.length){notify('Ajoute des DGs avant de lancer le draft');return;}
-  const rounds = parseInt(document.getElementById('draftRounds').value)||30;
-  const timerSec = parseInt(document.getElementById('draftTimerRange').value)||0;
-  const type = document.getElementById('draftType').value;
-  // Build full pick order
-  const picks = [];
-  for(let r=1;r<=rounds;r++){
-    const order = (type==='serpentin' && r%2===0) ? [...draftOrder].reverse() : [...draftOrder];
-    order.forEach((uid,i)=>picks.push({round:r,pick:(r-1)*draftOrder.length+i+1,uid,name:dgs.find(d=>d.id===uid)?.name||uid,selected:null}));
-  }
-  draftState = {status:'active',order:draftOrder,picks,currentPick:0,rounds,timerSec,type,drafted:{},startedAt:new Date().toISOString()};
-  draftedPlayers = {};
-  try{
-    await setDoc(doc(db,'draft','current'),draftState);
-    notify('Draft lancé! '+draftOrder.length+' DGs, '+rounds+' rondes');
-    showDraftLive();
-  }catch(e){notify('Erreur: '+e.message);}
+  const rounds=parseInt(document.getElementById('draftRounds').value)||30;
+  const timerSec=parseInt(document.getElementById('draftTimerRange').value)||0;
+  const type=document.getElementById('draftType').value;
+  const picks=[];
+  for(let r=1;r<=rounds;r++){const order=(type==='serpentin'&&r%2===0)?[...draftOrder].reverse():[...draftOrder];order.forEach((uid,i)=>picks.push({round:r,pick:(r-1)*draftOrder.length+i+1,uid,name:dgs.find(d=>d.id===uid)?.name||uid,selected:null}));}
+  draftState={status:'active',order:draftOrder,picks,currentPick:0,rounds,timerSec,type,drafted:{},startedAt:new Date().toISOString()};
+  draftedPlayers={};
+  try{await setDoc(doc(db,'draft','current'),draftState);notify('Draft lance! '+draftOrder.length+' DGs, '+rounds+' rondes');showDraftLive();}catch(e){notify('Erreur: '+e.message);}
 };
 
 function showDraftLive(){
   document.getElementById('draftSetup').classList.add('hidden');
   document.getElementById('draftLive').classList.remove('hidden');
-  draftedPlayers = draftState.drafted || {};
-  renderDraftPickList();
-  renderDraftPlayers();
-  updateDraftTurnUI();
-  if(draftState.timerSec > 0) startDraftTimer();
+  draftedPlayers=draftState.drafted||{};
+  renderDraftPickList();renderDraftPlayers();updateDraftTurnUI();
+  if(draftState.timerSec>0) startDraftTimer();
 }
 
 function updateDraftTurnUI(){
-  const picks = draftState.picks || [];
-  const curr = picks[draftState.currentPick];
-  if(!curr){
-    document.getElementById('draftRoundInfo').textContent = 'Draft terminé!';
-    document.getElementById('draftTurnBadge').textContent = 'Terminé';
-    document.getElementById('draftTurnBadge').className = 'draft-turn waiting';
-    document.getElementById('draftMyTurn').classList.add('hidden');
-    return;
-  }
-  const totalPicks = picks.length;
-  document.getElementById('draftRoundInfo').textContent = `Ronde ${curr.round} — Pick #${curr.pick}/${totalPicks}`;
-  const isMyTurn = currentUser && curr.uid === currentUser.uid;
-  document.getElementById('draftTurnBadge').textContent = isMyTurn ? 'TON TOUR!' : `Tour de ${curr.name}`;
-  document.getElementById('draftTurnBadge').className = 'draft-turn' + (isMyTurn ? '' : ' waiting');
+  const picks=draftState.picks||[];const curr=picks[draftState.currentPick];
+  if(!curr){document.getElementById('draftRoundInfo').textContent='Draft termine!';document.getElementById('draftTurnBadge').textContent='Termine';document.getElementById('draftTurnBadge').className='draft-turn waiting';document.getElementById('draftMyTurn').classList.add('hidden');return;}
+  document.getElementById('draftRoundInfo').textContent='Ronde '+curr.round+' — Pick #'+curr.pick+'/'+picks.length;
+  const isMyTurn=currentUser&&curr.uid===currentUser.uid;
+  document.getElementById('draftTurnBadge').textContent=isMyTurn?'TON TOUR!':'Tour de '+curr.name;
+  document.getElementById('draftTurnBadge').className='draft-turn'+(isMyTurn?'':' waiting');
   if(isMyTurn) document.getElementById('draftMyTurn').classList.remove('hidden');
   else document.getElementById('draftMyTurn').classList.add('hidden');
 }
 
 function renderDraftPickList(){
-  const picks = draftState.picks || [];
-  const curr = draftState.currentPick;
-  const visible = picks.slice(Math.max(0,curr-3), curr+10);
-  const startIdx = Math.max(0,curr-3);
-  document.getElementById('draftPickList').innerHTML = visible.map((p,i)=>{
-    const absIdx = startIdx+i;
-    const cls = absIdx===curr?'current':p.selected?'done':currentUser&&p.uid===currentUser.uid?'mine':'';
-    const numCls = absIdx===curr?'current':'';
-    return `<div class="draft-pick-row ${cls}">
-      <div class="draft-pick-num ${numCls}">${p.pick}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div>
-        <div style="font-size:10px;color:var(--text3);">R${p.round} ${p.selected?'→ '+p.selected:''}</div>
-      </div>
-    </div>`;
-  }).join('');
+  const picks=draftState.picks||[];const curr=draftState.currentPick;
+  const visible=picks.slice(Math.max(0,curr-3),curr+10);const startIdx=Math.max(0,curr-3);
+  document.getElementById('draftPickList').innerHTML=visible.map((p,i)=>{const absIdx=startIdx+i;const cls=absIdx===curr?'current':p.selected?'done':currentUser&&p.uid===currentUser.uid?'mine':'';const numCls=absIdx===curr?'current':'';return '<div class="draft-pick-row '+cls+'"><div class="draft-pick-num '+numCls+'">'+p.pick+'</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:10px;color:var(--text3);">R'+p.round+' '+(p.selected?'→ '+p.selected:'')+'</div></div></div>';}).join('');
 }
 
-
-const POS_LIMITS = { forwards: 16, defense: 10, goalies: 4 };
-
+const POS_LIMITS={forwards:16,defense:10,goalies:4};
 function getMyDraftCounts(){
-  if(!currentUser || !draftState) return {forwards:0, defense:0, goalies:0};
-  const myPicks = draftState.picks.filter(p=>p.uid===currentUser.uid && p.selected);
-  let f=0, d=0, g=0;
-  myPicks.forEach(p=>{
-    const player = NHL_PLAYERS.find(pl=>pl.name===p.selected);
-    if(!player) return;
-    if(player.pos==='G') g++;
-    else if(player.pos==='D') d++;
-    else f++;
-  });
-  return {forwards:f, defense:d, goalies:g};
+  if(!currentUser||!draftState) return {forwards:0,defense:0,goalies:0};
+  const myPicks=draftState.picks.filter(p=>p.uid===currentUser.uid&&p.selected);
+  let f=0,d=0,g=0;
+  myPicks.forEach(p=>{const player=NHL_PLAYERS.find(pl=>pl.name===p.selected);if(!player)return;if(player.pos==='G')g++;else if(player.pos==='D')d++;else f++;});
+  return {forwards:f,defense:d,goalies:g};
 }
-
-function isPositionMaxed(pos){
-  const counts = getMyDraftCounts();
-  if(pos==='G') return counts.goalies >= POS_LIMITS.goalies;
-  if(pos==='D') return counts.defense >= POS_LIMITS.defense;
-  return counts.forwards >= POS_LIMITS.forwards;
-}
+function isPositionMaxed(pos){const counts=getMyDraftCounts();if(pos==='G')return counts.goalies>=POS_LIMITS.goalies;if(pos==='D')return counts.defense>=POS_LIMITS.defense;return counts.forwards>=POS_LIMITS.forwards;}
 
 function renderDraftPlayers(){
-  const search = (document.getElementById('draftSearch')?.value||'').toLowerCase();
-  const pos = document.getElementById('draftPosFilter')?.value||'';
-  const isMyTurn = currentUser && draftState.picks[draftState.currentPick]?.uid === currentUser.uid;
-  const filtered = NHL_PLAYERS.filter(p=>{
-    const drafted = draftedPlayers[p.name];
-    const matchSearch = p.name.toLowerCase().includes(search) || p.team.toLowerCase().includes(search);
-    const matchPos = !pos || p.pos===pos;
-    return matchSearch && matchPos;
-  }).sort((a,b)=>b.rating-a.rating);
-
-  // Show position counts for current DG
-  const counts = getMyDraftCounts();
-  const posBar = `<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-    <span style="font-size:11px;padding:3px 8px;border-radius:5px;background:${counts.forwards>=POS_LIMITS.forwards?'rgba(239,68,68,0.2)':'rgba(245,158,11,0.1)'};color:${counts.forwards>=POS_LIMITS.forwards?'var(--red)':'var(--text2)'};">ATT: ${counts.forwards}/${POS_LIMITS.forwards}</span>
-    <span style="font-size:11px;padding:3px 8px;border-radius:5px;background:${counts.defense>=POS_LIMITS.defense?'rgba(239,68,68,0.2)':'rgba(139,92,246,0.1)'};color:${counts.defense>=POS_LIMITS.defense?'var(--red)':'var(--text2)'};">DEF: ${counts.defense}/${POS_LIMITS.defense}</span>
-    <span style="font-size:11px;padding:3px 8px;border-radius:5px;background:${counts.goalies>=POS_LIMITS.goalies?'rgba(239,68,68,0.2)':'rgba(200,16,46,0.1)'};color:${counts.goalies>=POS_LIMITS.goalies?'var(--red)':'var(--text2)'};">GOAL: ${counts.goalies}/${POS_LIMITS.goalies}</span>
-  </div>`;
-
-  const listHtml = filtered.map(p=>{
-    const drafted = draftedPlayers[p.name];
-    const maxed = isMyTurn && !drafted && isPositionMaxed(p.pos);
-    const blocked = drafted || maxed;
-    return `<div class="draft-player-item ${drafted?'drafted':maxed?'drafted':''}" onclick="${blocked||!isMyTurn?'':"pickPlayer('"+p.name+"')"}">
-      <span class="pos pos-${p.pos}" style="font-size:9px;padding:1px 5px;">${p.pos}</span>
-      <div style="flex:1;min-width:0;">
-        <div style="font-weight:600;font-size:13px;">${p.name} <span style="font-size:10px;color:var(--text3);">${p.team}</span></div>
-        ${drafted?'<div style="font-size:10px;color:var(--text3);">→ '+drafted+'</div>':''}
-        ${maxed?'<div style="font-size:10px;color:var(--red);">Maximum atteint pour cette position</div>':''}
-      </div>
-      ${!blocked&&isMyTurn?'<button class="btn btn-p" style="font-size:10px;padding:4px 10px;">Choisir</button>':''}
-      ${!drafted&&!maxed&&!isMyTurn?'<span style="font-size:10px;color:var(--text3);">⭐'+p.rating+'</span>':''}
-      ${drafted?'<span style="font-size:10px;color:var(--text3);">Repêché</span>':''}
-      ${maxed&&!drafted?'<span style="font-size:10px;color:var(--red);">Max atteint</span>':''}
-    </div>`;
-  }).join('');
-
-  document.getElementById('draftPlayerList').innerHTML = (isMyTurn ? posBar : '') + listHtml;
+  const search=(document.getElementById('draftSearch')?.value||'').toLowerCase();
+  const pos=document.getElementById('draftPosFilter')?.value||'';
+  const isMyTurn=currentUser&&draftState.picks[draftState.currentPick]?.uid===currentUser.uid;
+  const filtered=NHL_PLAYERS.filter(p=>{const drafted=draftedPlayers[p.name];const matchSearch=p.name.toLowerCase().includes(search)||p.team.toLowerCase().includes(search);const matchPos=!pos||p.pos===pos;return matchSearch&&matchPos;}).sort((a,b)=>b.rating-a.rating);
+  const counts=getMyDraftCounts();
+  const posBar='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.forwards>=POS_LIMITS.forwards?'rgba(239,68,68,0.2)':'rgba(245,158,11,0.1)')+';color:'+(counts.forwards>=POS_LIMITS.forwards?'var(--red)':'var(--text2)')+';">ATT: '+counts.forwards+'/'+POS_LIMITS.forwards+'</span><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.defense>=POS_LIMITS.defense?'rgba(239,68,68,0.2)':'rgba(139,92,246,0.1)')+';color:'+(counts.defense>=POS_LIMITS.defense?'var(--red)':'var(--text2)')+';">DEF: '+counts.defense+'/'+POS_LIMITS.defense+'</span><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.goalies>=POS_LIMITS.goalies?'rgba(239,68,68,0.2)':'rgba(200,16,46,0.1)')+';color:'+(counts.goalies>=POS_LIMITS.goalies?'var(--red)':'var(--text2)')+';">GOAL: '+counts.goalies+'/'+POS_LIMITS.goalies+'</span></div>';
+  const listHtml=filtered.map(p=>{const drafted=draftedPlayers[p.name];const maxed=isMyTurn&&!drafted&&isPositionMaxed(p.pos);const blocked=drafted||maxed;return '<div class="draft-player-item '+(drafted?'drafted':maxed?'drafted':'')+'" onclick="'+(blocked||!isMyTurn?'':'pickPlayer(\''+p.name+'\')')+'"><span class="pos pos-'+p.pos+'" style="font-size:9px;padding:1px 5px;">'+p.pos+'</span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;">'+p.name+' <span style="font-size:10px;color:var(--text3);">'+p.team+'</span></div>'+(drafted?'<div style="font-size:10px;color:var(--text3);">→ '+drafted+'</div>':'')+(maxed?'<div style="font-size:10px;color:var(--red);">Maximum atteint pour cette position</div>':'')+'</div>'+((!blocked&&isMyTurn)?'<button class="btn btn-p" style="font-size:10px;padding:4px 10px;">Choisir</button>':'')+(!drafted&&!maxed&&!isMyTurn?'<span style="font-size:10px;color:var(--text3);">⭐'+p.rating+'</span>':'')+( drafted?'<span style="font-size:10px;color:var(--text3);">Repêché</span>':'')+(maxed&&!drafted?'<span style="font-size:10px;color:var(--red);">Max atteint</span>':'')+'</div>';}).join('');
+  document.getElementById('draftPlayerList').innerHTML=(isMyTurn?posBar:'')+listHtml;
 }
 
-window.filterDraftPlayers = function(){ renderDraftPlayers(); };
+window.filterDraftPlayers=function(){renderDraftPlayers();};
 
-window.pickPlayer = async function(playerName){
-  if(!currentUser||!draftState) return;
-  const curr = draftState.picks[draftState.currentPick];
+window.pickPlayer=async function(playerName){
+  if(!currentUser||!draftState)return;
+  const curr=draftState.picks[draftState.currentPick];
   if(!curr||curr.uid!==currentUser.uid){notify('Ce nest pas ton tour');return;}
-  const player = NHL_PLAYERS.find(p=>p.name===playerName);
+  const player=NHL_PLAYERS.find(p=>p.name===playerName);
   if(!player||draftedPlayers[playerName]){notify('Joueur non disponible');return;}
-  if(isPositionMaxed(player.pos)){
-    const posName = player.pos==='G'?'gardiens':player.pos==='D'?'défenseurs':'attaquants';
-    notify('Maximum de '+posName+' atteint pour ton roster!');return;
-  }
-  // Assign player to DG roster
-  draftedPlayers[playerName] = curr.name;
-  draftState.picks[draftState.currentPick].selected = playerName;
+  if(isPositionMaxed(player.pos)){const posName=player.pos==='G'?'gardiens':player.pos==='D'?'defenseurs':'attaquants';notify('Maximum de '+posName+' atteint!');return;}
+  draftedPlayers[playerName]=curr.name;
+  draftState.picks[draftState.currentPick].selected=playerName;
   draftState.currentPick++;
-  draftState.drafted = draftedPlayers;
-  // Add to DG roster in Firebase
+  draftState.drafted=draftedPlayers;
   try{
-    const rSnap = await getDoc(doc(db,'rosters',currentUser.uid));
-    const rData = rSnap.exists()?rSnap.data():{actif:[],reserve:[]};
-    const newPlayer = {num:0,name:player.name,team:player.team,pos:player.pos,status:'active',todayPts:0,seasonPts:0};
-    const actif = rData.actif||[];
-    const reserve = rData.reserve||[];
-    if(actif.length<20) actif.push(newPlayer);
-    else reserve.push({...newPlayer,status:'reserve'});
+    const rSnap=await getDoc(doc(db,'rosters',currentUser.uid));
+    const rData=rSnap.exists()?rSnap.data():{actif:[],reserve:[]};
+    const newPlayer={num:0,name:player.name,team:player.team,pos:player.pos,status:'active',todayPts:0,seasonPts:0};
+    const actif=rData.actif||[];const reserve=rData.reserve||[];
+    if(actif.length<20)actif.push(newPlayer);else reserve.push({...newPlayer,status:'reserve'});
     await setDoc(doc(db,'rosters',currentUser.uid),{actif,reserve,ts:serverTimestamp()});
-    ra = actif; rr = reserve;
-    renderRoster();updateStats();
-    // Update draft state in Firebase
+    ra=actif;rr=reserve;renderRoster();updateStats();
     await setDoc(doc(db,'draft','current'),draftState);
-    stopDraftTimer();
-    if(draftState.timerSec>0) startDraftTimer();
-    renderDraftPickList();
-    renderDraftPlayers();
-    updateDraftTurnUI();
-    await logTx(curr.name+' a repêché '+playerName+' (Pick #'+curr.pick+')');
+    stopDraftTimer();if(draftState.timerSec>0)startDraftTimer();
+    renderDraftPickList();renderDraftPlayers();updateDraftTurnUI();
+    await logTx(curr.name+' a repeche '+playerName+' (Pick #'+curr.pick+')');
     notify(curr.name+' choisit '+playerName+'!');
   }catch(e){notify('Erreur: '+e.message);}
 };
 
 function startDraftTimer(){
-  stopDraftTimer();
-  if(draftState.timerSec===0) return;
-  draftTimeLeft = draftState.timerSec;
+  stopDraftTimer();if(draftState.timerSec===0)return;
+  draftTimeLeft=draftState.timerSec;
   document.getElementById('draftTimer').classList.remove('hidden');
-  draftTimerInterval = setInterval(()=>{
+  draftTimerInterval=setInterval(()=>{
     draftTimeLeft--;
-    const m=Math.floor(draftTimeLeft/60);
-    const s=draftTimeLeft%60;
+    const m=Math.floor(draftTimeLeft/60);const s=draftTimeLeft%60;
     document.getElementById('draftTimer').textContent=m+':'+(s+'').padStart(2,'0');
-    if(draftTimeLeft<=10) document.getElementById('draftTimer').className='draft-timer urgent';
-    if(draftTimeLeft<=0){
-      stopDraftTimer();
-      // Auto-skip — advance pick
-      draftState.currentPick++;
-      setDoc(doc(db,'draft','current'),draftState);
-      renderDraftPickList();updateDraftTurnUI();
-      if(draftState.timerSec>0) startDraftTimer();
-      notify('Temps écoulé — pick passé au suivant');
-    }
+    if(draftTimeLeft<=10)document.getElementById('draftTimer').className='draft-timer urgent';
+    if(draftTimeLeft<=0){stopDraftTimer();draftState.currentPick++;setDoc(doc(db,'draft','current'),draftState);renderDraftPickList();updateDraftTurnUI();if(draftState.timerSec>0)startDraftTimer();notify('Temps ecoule — pick passe au suivant');}
   },1000);
 }
+function stopDraftTimer(){if(draftTimerInterval)clearInterval(draftTimerInterval);draftTimerInterval=null;document.getElementById('draftTimer').className='draft-timer hidden';}
+window.closeDraftModal=function(){stopDraftTimer();document.getElementById('draftModal').classList.add('hidden');};
+window.resetDraft=async function(){if(!isAdmin||!confirm('Recommencer le draft?'))return;await setDoc(doc(db,'draft','current'),{status:'reset'});draftState=null;draftedPlayers={};showDraftSetup();notify('Draft reinitialise');};
 
-function stopDraftTimer(){
-  if(draftTimerInterval) clearInterval(draftTimerInterval);
-  draftTimerInterval=null;
-  document.getElementById('draftTimer').className='draft-timer hidden';
+// ADMIN ROSTER MANAGEMENT
+window.openAdminRoster=async function(dgId){
+  if(!isAdmin){notify('Seulement le commissaire');return;}
+  adminRosterDgId=dgId;
+  const dg=dgs.find(d=>d.id===dgId);
+  document.getElementById('adminRosterTitle').textContent='Roster de '+(dg?.name||dgId);
+  adminKeepers=new Set();
+  try{
+    const snap=await getDoc(doc(db,'rosters',dgId));
+    if(snap.exists()){adminRosterActif=snap.data().actif||[];adminRosterReserve=snap.data().reserve||[];}
+    else{adminRosterActif=[];adminRosterReserve=[];}
+  }catch(e){adminRosterActif=[];adminRosterReserve=[];}
+  renderAdminRosterList();
+  document.getElementById('adminRosterModal').classList.remove('hidden');
+};
+
+function renderAdminRosterList(){
+  const all=[...adminRosterActif,...adminRosterReserve];
+  if(!all.length){document.getElementById('adminRosterList').innerHTML='<div class="empty" style="grid-column:span 2;">Roster vide</div>';return;}
+  document.getElementById('adminRosterList').innerHTML=all.map((p,i)=>{
+    const isKeeper=adminKeepers.has(p.name);
+    const zone=i<adminRosterActif.length?'Actif':'Reserve';
+    const safeName=p.name.replace(/'/g,'');
+    return '<div class="keeper-item '+(isKeeper?'selected':'')+'" onclick="toggleAdminKeeper(\''+safeName+'\')">'
+      +'<div class="keeper-chk">'+(isKeeper?'✓':'')+'</div>'
+      +'<span class="pos pos-'+p.pos+'" style="font-size:9px;padding:1px 5px;">'+p.pos+'</span>'
+      +'<div style="flex:1;min-width:0;">'
+      +'<div style="font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.name+'</div>'
+      +'<div style="font-size:10px;color:var(--text2);">'+p.team+' • '+zone+' • '+(p.seasonPts||0)+' pts</div>'
+      +'</div>'
+      +'<button class="ab danger" style="font-size:10px;padding:2px 7px;" onclick="event.stopPropagation();adminCutPlayer(\''+safeName+'\')">✕</button>'
+      +'</div>';
+  }).join('');
 }
 
-window.closeDraftModal = function(){
-  stopDraftTimer();
-  document.getElementById('draftModal').classList.add('hidden');
+window.toggleAdminKeeper=function(name){if(adminKeepers.has(name))adminKeepers.delete(name);else adminKeepers.add(name);renderAdminRosterList();};
+
+window.selectTopKeepers=function(){
+  const count=parseInt(document.getElementById('keepersCount').value)||15;
+  const all=[...adminRosterActif,...adminRosterReserve];
+  const sorted=[...all].sort((a,b)=>(b.seasonPts||0)-(a.seasonPts||0));
+  adminKeepers=new Set(sorted.slice(0,count).map(p=>p.name));
+  renderAdminRosterList();
+  notify(adminKeepers.size+' keepers selectionnes automatiquement');
 };
 
-window.resetDraft = async function(){
-  if(!isAdmin||!confirm('Recommencer le draft à zéro?')) return;
-  await setDoc(doc(db,'draft','current'),{status:'reset'});
-  draftState=null;draftedPlayers={};
-  showDraftSetup();
-  notify('Draft réinitialisé');
+window.saveAdminKeepers=async function(){
+  if(!adminRosterDgId)return;
+  try{await setDoc(doc(db,'keepers',adminRosterDgId),{players:[...adminKeepers],updatedAt:serverTimestamp()});notify('Keepers sauvegardes!');}
+  catch(e){notify('Erreur: '+e.message);}
 };
 
+window.releaseNonKeepers=async function(){
+  if(!adminRosterDgId)return;
+  const all=[...adminRosterActif,...adminRosterReserve];
+  const toRelease=all.filter(p=>!adminKeepers.has(p.name));
+  if(!toRelease.length){notify('Aucun joueur a relacher');return;}
+  if(!confirm('Relacher '+toRelease.length+' joueurs dans le waiver wire?'))return;
+  const keepActif=adminRosterActif.filter(p=>adminKeepers.has(p.name));
+  const keepReserve=adminRosterReserve.filter(p=>adminKeepers.has(p.name));
+  try{
+    await setDoc(doc(db,'rosters',adminRosterDgId),{actif:keepActif,reserve:keepReserve,ts:serverTimestamp()});
+    const wSnap=await getDoc(doc(db,'config','waiver'));
+    const cw=wSnap.exists()?(wSnap.data().players||[]):[];
+    const newWaiver=[...toRelease.map(p=>({name:p.name,team:p.team,pos:p.pos,num:p.num||0,seasonPts:p.seasonPts||0})),...cw];
+    await setDoc(doc(db,'config','waiver'),{players:newWaiver});
+    adminRosterActif=keepActif;adminRosterReserve=keepReserve;adminKeepers=new Set();
+    renderAdminRosterList();
+    const dg=dgs.find(d=>d.id===adminRosterDgId);
+    await logTx((dg?.name||'Un DG')+' a relache '+toRelease.length+' joueurs vers waiver');
+    notify(toRelease.length+' joueurs relaches!');
+  }catch(e){notify('Erreur: '+e.message);}
+};
 
+window.adminCutPlayer=async function(name){
+  if(!confirm('Relacher '+name+'?'))return;
+  const player=[...adminRosterActif,...adminRosterReserve].find(p=>p.name===name)||{name,team:'',pos:'C',seasonPts:0};
+  adminRosterActif=adminRosterActif.filter(p=>p.name!==name);
+  adminRosterReserve=adminRosterReserve.filter(p=>p.name!==name);
+  try{
+    await setDoc(doc(db,'rosters',adminRosterDgId),{actif:adminRosterActif,reserve:adminRosterReserve,ts:serverTimestamp()});
+    const wSnap=await getDoc(doc(db,'config','waiver'));
+    const cw=wSnap.exists()?(wSnap.data().players||[]):[];
+    await setDoc(doc(db,'config','waiver'),{players:[{name,team:player.team,pos:player.pos,num:0,seasonPts:player.seasonPts||0},...cw]});
+    renderAdminRosterList();
+    notify(name+' relache dans le waiver wire');
+  }catch(e){notify('Erreur: '+e.message);}
+};
 
-// ========================
-// CHAT SYSTEM
-// ========================
-
-let chatMessages = [];
-let chatLastRead = 0;
-let chatPolling = null;
-
+// CHAT
 async function loadChat(){
   try{
-    const s = await getDocs(collection(db,'chat'));
-    chatMessages = [];
-    s.forEach(d=>chatMessages.push({id:d.id,...d.data()}));
+    const s=await getDocs(collection(db,'chat'));
+    chatMessages=[];s.forEach(d=>chatMessages.push({id:d.id,...d.data()}));
     chatMessages.sort((a,b)=>(a.ts?.seconds||0)-(b.ts?.seconds||0));
-    renderChat();
-    checkChatBadge();
+    renderChat();checkChatBadge();
   }catch(e){}
 }
 
 function renderChat(){
-  const box = document.getElementById('chatMessages');
-  if(!box) return;
-  if(!chatMessages.length){
-    box.innerHTML='<div class="empty">Aucun message — sois le premier à écrire!</div>';
-    return;
-  }
-  box.innerHTML = chatMessages.map(m=>{
-    const isMe = currentUser && m.uid === currentUser.uid;
-    const c = COLORS[(m.colorIdx||0)%10];
-    const ini = (m.author||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
-    const time = m.ts ? new Date(m.ts.seconds*1000).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'}) : '';
-    if(m.type==='system') return `<div class="chat-system">${m.text}</div>`;
-    return `<div class="chat-msg ${isMe?'mine':''}">
-      <div class="chat-av" style="background:${c}22;color:${c}">${ini}</div>
-      <div>
-        ${!isMe?'<div style="font-size:10px;color:var(--text3);margin-bottom:2px;">'+m.author+'</div>':''}
-        <div class="chat-bubble">${escapeHtml(m.text)}</div>
-        <div class="chat-meta">${time}</div>
-      </div>
-    </div>`;
+  const box=document.getElementById('chatMessages');
+  if(!box)return;
+  if(!chatMessages.length){box.innerHTML='<div class="empty">Aucun message — sois le premier!</div>';return;}
+  box.innerHTML=chatMessages.map(m=>{
+    const isMe=currentUser&&m.uid===currentUser.uid;
+    const c=COLORS[(m.colorIdx||0)%10];
+    const ini=(m.author||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
+    const time=m.ts?new Date(m.ts.seconds*1000).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'}):'';
+    if(m.type==='system') return '<div class="chat-system">'+m.text+'</div>';
+    return '<div class="chat-msg '+(isMe?'mine':'')+'"><div class="chat-av" style="background:'+c+'22;color:'+c+'">'+ini+'</div><div>'+((!isMe)?'<div style="font-size:10px;color:var(--text3);margin-bottom:2px;">'+m.author+'</div>':'')+'<div class="chat-bubble">'+escapeHtml(m.text)+'</div><div class="chat-meta">'+time+'</div></div></div>';
   }).join('');
-  // Scroll to bottom
-  box.scrollTop = box.scrollHeight;
+  box.scrollTop=box.scrollHeight;
 }
 
-function escapeHtml(str){
-  return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
+function escapeHtml(str){return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function checkChatBadge(){
-  const badge = document.getElementById('chatBadge');
-  if(!badge) return;
-  const lastMsg = chatMessages[chatMessages.length-1];
-  if(!lastMsg) return;
-  const lastTs = lastMsg.ts?.seconds||0;
-  // Show badge if last message is newer than last read and not from me
-  if(lastTs > chatLastRead && lastMsg.uid !== currentUser?.uid){
-    badge.style.display='inline';
-  }
+  const badge=document.getElementById('chatBadge');if(!badge)return;
+  const lastMsg=chatMessages[chatMessages.length-1];if(!lastMsg)return;
+  const lastTs=lastMsg.ts?.seconds||0;
+  if(lastTs>chatLastRead&&lastMsg.uid!==currentUser?.uid){badge.style.display='inline';}
 }
+window.markChatRead=function(){const badge=document.getElementById('chatBadge');if(badge)badge.style.display='none';const lastMsg=chatMessages[chatMessages.length-1];if(lastMsg)chatLastRead=lastMsg.ts?.seconds||0;};
 
-window.markChatRead = function(){
-  const badge = document.getElementById('chatBadge');
-  if(badge) badge.style.display='none';
-  const lastMsg = chatMessages[chatMessages.length-1];
-  if(lastMsg) chatLastRead = lastMsg.ts?.seconds||0;
-};
-
-window.sendChatMsg = async function(channel='general'){
-  const inputId = channel==='general'?'chatInput':'input_'+channel;
-  const input = document.getElementById(inputId);
-  const text = (input?.value||'').trim();
-  if(!text||!currentUser||isGuest) return;
+window.sendChatMsg=async function(channel='general'){
+  const inputId=channel==='general'?'chatInput':'input_'+channel;
+  const input=document.getElementById(inputId);
+  const text=(input?.value||'').trim();
+  if(!text||!currentUser||isGuest)return;
   input.value='';
   const dg=dgs.find(d=>d.id===currentUser.uid);
-  const msgData={
-    uid:currentUser.uid,
-    author:dg?.name||currentUser.displayName||currentUser.email,
-    colorIdx:dg?.color||0,
-    text,
-    ts:serverTimestamp()
-  };
+  const msgData={uid:currentUser.uid,author:dg?.name||currentUser.displayName||currentUser.email,colorIdx:dg?.color||0,text,ts:serverTimestamp()};
   try{
-    if(channel==='general'){
-      await addDoc(collection(db,'chat'),msgData);
-      await loadChat();
-    } else {
-      // Private message
+    if(channel==='general'){await addDoc(collection(db,'chat'),msgData);await loadChat();}
+    else{
       await addDoc(collection(db,'privateChat_'+channel),msgData);
-      // Update index for recipient
-      const parts=channel.split('_');
-      const otherUid=parts.find(p=>p!==currentUser.uid);
-      if(otherUid){
-        await setDoc(doc(db,'privateChats_index_'+otherUid,channel),{
-          participants:[currentUser.uid,otherUid],
-          lastMsg:text,
-          hasUnread:true,
-          ts:serverTimestamp()
-        },{merge:true});
-      }
+      const parts=channel.split('_');const otherUid=parts.find(p=>p!==currentUser.uid);
+      if(otherUid){await setDoc(doc(db,'privateChats_index_'+otherUid,channel),{participants:[currentUser.uid,otherUid],lastMsg:text,hasUnread:true,ts:serverTimestamp()},{merge:true});}
       await loadPrivateChat(channel);
     }
   }catch(e){notify('Erreur envoi: '+e.message);}
 };
 
-window.chatKeyDown = function(e, channel='general'){
-  if(e.key==='Enter'&&!e.shiftKey){
-    e.preventDefault();
-    sendChatMsg(channel);
-  }
-};
-
-async function sendSystemChat(msg){
-  try{
-    await addDoc(collection(db,'chat'),{
-      uid:'system', author:'Système', text:msg, type:'system', ts:serverTimestamp()
-    });
-  }catch(e){}
-}
+window.chatKeyDown=function(e,channel='general'){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChatMsg(channel);}};
 
 function startChatPolling(){
-  if(chatPolling) clearInterval(chatPolling);
-  chatPolling = setInterval(async()=>{
-    const prevCount = chatMessages.length;
+  if(chatPolling)clearInterval(chatPolling);
+  chatPolling=setInterval(async()=>{
+    const prevCount=chatMessages.length;
     await loadChat();
-    if(chatMessages.length > prevCount){
-      const lastMsg = chatMessages[chatMessages.length-1];
-      if(lastMsg.uid !== currentUser?.uid && lastMsg.type !== 'system'){
-        checkChatBadge();
-      }
-    }
+    if(chatMessages.length>prevCount){const lastMsg=chatMessages[chatMessages.length-1];if(lastMsg.uid!==currentUser?.uid&&lastMsg.type!=='system'){checkChatBadge();}}
     await checkPrivateMessages();
-  }, 15000);
+  },15000);
 }
 
-
-
-// ========================
 // PRIVATE CHAT
-// ========================
+function getConversationId(uid1,uid2){return [uid1,uid2].sort().join('_');}
 
-let privateChats = {}; // {conversationId: [messages]}
-let activePrivateChats = []; // open conversation ids
-let activeChatTab = 'general';
-let unreadPrivate = {}; // {conversationId: count}
-
-function getConversationId(uid1, uid2){
-  return [uid1,uid2].sort().join('_');
-}
-
-window.openPrivateChat = function(){
-  if(isGuest||!currentUser){notify('Connecte-toi pour envoyer des messages privés');return;}
-  const others = dgs.filter(d=>d.id!==currentUser.uid);
-  document.getElementById('privateDgList').innerHTML = others.length ? others.map(d=>{
-    const c=COLORS[d.color||0];
-    const ini=(d.name||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
+window.openPrivateChat=function(){
+  if(isGuest||!currentUser){notify('Connecte-toi pour envoyer des messages prives');return;}
+  const others=dgs.filter(d=>d.id!==currentUser.uid);
+  document.getElementById('privateDgList').innerHTML=others.length?others.map(d=>{
+    const c=COLORS[d.color||0];const ini=(d.name||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
     const safeName=(d.name||d.id).replace(/['"]/g,'');
-    return `<div class="swap-player" onclick="startPrivateChat('${d.id}','${safeName}')">
-      <div class="dgav" style="background:${c}22;color:${c};width:32px;height:32px;font-size:11px;">${ini}</div>
-      <span style="font-weight:600;font-size:13px;">${d.name||d.id}</span>
-    </div>`;
-  }).join('') : '<div class="empty">Aucun autre DG disponible</div>';
+    return '<div class="swap-player" onclick="startPrivateChat(\''+d.id+'\',\''+safeName+'\')"><div class="dgav" style="background:'+c+'22;color:'+c+';width:32px;height:32px;font-size:11px;">'+ini+'</div><span style="font-weight:600;font-size:13px;">'+(d.name||d.id)+'</span></div>';
+  }).join(''):'<div class="empty">Aucun autre DG disponible</div>';
   document.getElementById('privateChatModal').classList.remove('hidden');
 };
 
-window.startPrivateChat = async function(otherUid, otherName){
+window.startPrivateChat=async function(otherUid,otherName){
   document.getElementById('privateChatModal').classList.add('hidden');
-  const convId = getConversationId(currentUser.uid, otherUid);
-  if(!activePrivateChats.includes(convId)){
-    activePrivateChats.push(convId);
-    addPrivateChatTab(convId, otherName, otherUid);
-  }
-  switchChatTab(convId);
-  await loadPrivateChat(convId);
+  const convId=getConversationId(currentUser.uid,otherUid);
+  if(!activePrivateChats.includes(convId)){activePrivateChats.push(convId);addPrivateChatTab(convId,otherName,otherUid);}
+  switchChatTab(convId);await loadPrivateChat(convId);
 };
 
-function addPrivateChatTab(convId, name, otherUid){
-  // Add tab button
-  const tab = document.createElement('button');
-  tab.className = 'tab-btn';
-  tab.id = 'tab_'+convId;
-  const closeBtn = convId;
-  tab.innerHTML = name+' <span class="priv-badge hidden" id="badge_'+convId+'">&#9679;</span>';
-  const x = document.createElement('span');
-  x.textContent = ' ✕';
-  x.style.cssText = 'margin-left:4px;opacity:0.5;font-size:11px;cursor:pointer;';
-  x.onclick = (e)=>closePrivateTab(e, closeBtn);
-  tab.appendChild(x);
-  tab.onclick = ()=>switchChatTab(convId);
+function addPrivateChatTab(convId,name,otherUid){
+  const tab=document.createElement('button');
+  tab.className='tab-btn';tab.id='tab_'+convId;
+  tab.innerHTML=name+' <span class="priv-badge hidden" id="badge_'+convId+'">&#9679;</span>';
+  const x=document.createElement('span');x.textContent=' ✕';x.style.cssText='margin-left:4px;opacity:0.5;font-size:11px;cursor:pointer;';
+  x.onclick=(e)=>closePrivateTab(e,convId);tab.appendChild(x);
+  tab.onclick=()=>switchChatTab(convId);
   document.getElementById('privateTabs').appendChild(tab);
-
-  // Add chat container
-  const container = document.createElement('div');
-  container.id = 'chat_'+convId;
-  container.className = 'hidden chat-container';
-  container.style.marginTop = '0';
-  const msgs = document.createElement('div');
-  msgs.className = 'chat-messages';
-  msgs.id = 'msgs_'+convId;
-  msgs.innerHTML = '<div class="empty"><div class="spin"></div></div>';
-  const inputRow = document.createElement('div');
-  inputRow.className = 'chat-input-row';
-  const ta = document.createElement('textarea');
-  ta.className = 'chat-input';
-  ta.id = 'input_'+convId;
-  ta.placeholder = 'Message privé à '+name+'...';
-  ta.rows = 1;
-  ta.onkeydown = (e)=>chatKeyDown(e, convId);
-  const sendBtn = document.createElement('button');
-  sendBtn.className = 'chat-send';
-  sendBtn.textContent = 'Envoyer';
-  sendBtn.onclick = ()=>sendChatMsg(convId);
-  inputRow.appendChild(ta);
-  inputRow.appendChild(sendBtn);
-  container.appendChild(msgs);
-  container.appendChild(inputRow);
+  const container=document.createElement('div');container.id='chat_'+convId;container.className='hidden chat-container';container.style.marginTop='0';
+  const msgs=document.createElement('div');msgs.className='chat-messages';msgs.id='msgs_'+convId;msgs.innerHTML='<div class="empty"><div class="spin"></div></div>';
+  const inputRow=document.createElement('div');inputRow.className='chat-input-row';
+  const ta=document.createElement('textarea');ta.className='chat-input';ta.id='input_'+convId;ta.placeholder='Message prive a '+name+'...';ta.rows=1;ta.onkeydown=(e)=>chatKeyDown(e,convId);
+  const sendBtn=document.createElement('button');sendBtn.className='chat-send';sendBtn.textContent='Envoyer';sendBtn.onclick=()=>sendChatMsg(convId);
+  inputRow.appendChild(ta);inputRow.appendChild(sendBtn);container.appendChild(msgs);container.appendChild(inputRow);
   document.getElementById('privateChatContainers').appendChild(container);
 }
 
-window.closePrivateTab = function(e, convId){
-  e.stopPropagation();
-  activePrivateChats = activePrivateChats.filter(id=>id!==convId);
-  document.getElementById('tab_'+convId)?.remove();
-  document.getElementById('chat_'+convId)?.remove();
-  if(activeChatTab===convId) switchChatTab('general');
-};
+window.closePrivateTab=function(e,convId){e.stopPropagation();activePrivateChats=activePrivateChats.filter(id=>id!==convId);document.getElementById('tab_'+convId)?.remove();document.getElementById('chat_'+convId)?.remove();if(activeChatTab===convId)switchChatTab('general');};
 
-window.switchChatTab = function(tab){
-  activeChatTab = tab;
-  // Hide all
+window.switchChatTab=function(tab){
+  activeChatTab=tab;
   document.getElementById('chatGeneral').classList.add('hidden');
   document.querySelectorAll('[id^="chat_"]').forEach(el=>el.classList.add('hidden'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  // Show selected
-  if(tab==='general'){
-    document.getElementById('chatGeneral').classList.remove('hidden');
-    document.getElementById('tabGeneral').classList.add('active');
-  } else {
-    const el=document.getElementById('chat_'+tab);
-    if(el) el.classList.remove('hidden');
-    const tabBtn=document.getElementById('tab_'+tab);
-    if(tabBtn) tabBtn.classList.add('active');
-    // Clear unread badge
-    const badge=document.getElementById('badge_'+tab);
-    if(badge) badge.classList.add('hidden');
-    unreadPrivate[tab]=0;
-    updateChatNavBadge();
-    // Load messages
-    loadPrivateChat(tab);
-  }
+  if(tab==='general'){document.getElementById('chatGeneral').classList.remove('hidden');document.getElementById('tabGeneral').classList.add('active');}
+  else{const el=document.getElementById('chat_'+tab);if(el)el.classList.remove('hidden');const tabBtn=document.getElementById('tab_'+tab);if(tabBtn)tabBtn.classList.add('active');const badge=document.getElementById('badge_'+tab);if(badge)badge.classList.add('hidden');unreadPrivate[tab]=0;updateChatNavBadge();loadPrivateChat(tab);}
 };
 
 async function loadPrivateChat(convId){
-  try{
-    const s = await getDocs(collection(db,'privateChat_'+convId));
-    let msgs=[];
-    s.forEach(d=>msgs.push({id:d.id,...d.data()}));
-    msgs.sort((a,b)=>(a.ts?.seconds||0)-(b.ts?.seconds||0));
-    privateChats[convId]=msgs;
-    renderPrivateChat(convId);
-  }catch(e){}
+  try{const s=await getDocs(collection(db,'privateChat_'+convId));let msgs=[];s.forEach(d=>msgs.push({id:d.id,...d.data()}));msgs.sort((a,b)=>(a.ts?.seconds||0)-(b.ts?.seconds||0));privateChats[convId]=msgs;renderPrivateChat(convId);}catch(e){}
 }
 
 function renderPrivateChat(convId){
-  const box=document.getElementById('msgs_'+convId);
-  if(!box) return;
+  const box=document.getElementById('msgs_'+convId);if(!box)return;
   const msgs=privateChats[convId]||[];
-  if(!msgs.length){box.innerHTML='<div class="empty">Début de la conversation privée</div>';return;}
-  box.innerHTML=msgs.map(m=>{
-    const isMe=currentUser&&m.uid===currentUser.uid;
-    const c=COLORS[(m.colorIdx||0)%10];
-    const ini=(m.author||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
-    const time=m.ts?new Date(m.ts.seconds*1000).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'}):'';
-    return `<div class="chat-msg ${isMe?'mine':''}">
-      <div class="chat-av" style="background:${c}22;color:${c}">${ini}</div>
-      <div>
-        ${!isMe?'<div style="font-size:10px;color:var(--text3);margin-bottom:2px;">'+m.author+'</div>':''}
-        <div class="chat-bubble">${escapeHtml(m.text)}</div>
-        <div class="chat-meta">${time}</div>
-      </div>
-    </div>`;
-  }).join('');
+  if(!msgs.length){box.innerHTML='<div class="empty">Debut de la conversation privee</div>';return;}
+  box.innerHTML=msgs.map(m=>{const isMe=currentUser&&m.uid===currentUser.uid;const c=COLORS[(m.colorIdx||0)%10];const ini=(m.author||'?').split(' ').map(n=>n[0]).join('').slice(0,2);const time=m.ts?new Date(m.ts.seconds*1000).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'}):'';return '<div class="chat-msg '+(isMe?'mine':'')+'"><div class="chat-av" style="background:'+c+'22;color:'+c+'">'+ini+'</div><div>'+((!isMe)?'<div style="font-size:10px;color:var(--text3);margin-bottom:2px;">'+m.author+'</div>':'')+'<div class="chat-bubble">'+escapeHtml(m.text)+'</div><div class="chat-meta">'+time+'</div></div></div>';}).join('');
   box.scrollTop=box.scrollHeight;
 }
 
-function updateChatNavBadge(){
-  const badge=document.getElementById('chatBadge');
-  if(!badge) return;
-  const total=Object.values(unreadPrivate).reduce((a,b)=>a+b,0);
-  if(total>0){badge.textContent='●';badge.style.display='inline';}
-  else{badge.style.display='none';}
-}
+function updateChatNavBadge(){const badge=document.getElementById('chatBadge');if(!badge)return;const total=Object.values(unreadPrivate).reduce((a,b)=>a+b,0);if(total>0){badge.textContent='●';badge.style.display='inline';}else{badge.style.display='none';}}
 
 async function checkPrivateMessages(){
-  if(!currentUser||isGuest) return;
-  // Check all active conversations for new messages
+  if(!currentUser||isGuest)return;
   for(const convId of activePrivateChats){
     const prevCount=(privateChats[convId]||[]).length;
     await loadPrivateChat(convId);
     const newCount=(privateChats[convId]||[]).length;
-    if(newCount>prevCount && activeChatTab!==convId){
-      const diff=newCount-prevCount;
-      unreadPrivate[convId]=(unreadPrivate[convId]||0)+diff;
-      const badge=document.getElementById('badge_'+convId);
-      if(badge){badge.textContent=unreadPrivate[convId];badge.classList.remove('hidden');}
-      updateChatNavBadge();
-    }
+    if(newCount>prevCount&&activeChatTab!==convId){const diff=newCount-prevCount;unreadPrivate[convId]=(unreadPrivate[convId]||0)+diff;const badge=document.getElementById('badge_'+convId);if(badge){badge.textContent=unreadPrivate[convId];badge.classList.remove('hidden');}updateChatNavBadge();}
   }
-  // Check if we have any unread private messages from other DGs
-  // by scanning recent private chats involving our uid
   try{
     const allConvs=await getDocs(collection(db,'privateChats_index_'+currentUser.uid));
-    allConvs.forEach(d=>{
-      const convId=d.id;
-      if(!activePrivateChats.includes(convId)){
-        const data=d.data();
-        const otherUid=data.participants?.find(p=>p!==currentUser.uid);
-        const otherName=dgs.find(d2=>d2.id===otherUid)?.name||'DG';
-        if(data.hasUnread){
-          // Auto-open the tab
-          activePrivateChats.push(convId);
-          addPrivateChatTab(convId,otherName,otherUid);
-          unreadPrivate[convId]=1;
-          const badge=document.getElementById('badge_'+convId);
-          if(badge){badge.classList.remove('hidden');}
-          updateChatNavBadge();
-        }
-      }
-    });
+    allConvs.forEach(d=>{const convId=d.id;if(!activePrivateChats.includes(convId)){const data=d.data();const otherUid=data.participants?.find(p=>p!==currentUser.uid);const otherName=dgs.find(d2=>d2.id===otherUid)?.name||'DG';if(data.hasUnread){activePrivateChats.push(convId);addPrivateChatTab(convId,otherName,otherUid);unreadPrivate[convId]=1;const badge=document.getElementById('badge_'+convId);if(badge){badge.classList.remove('hidden');}updateChatNavBadge();}}});
   }catch(e){}
 }
 
-
-window.cancelTrade=function(){if(confirm('Annuler le dernier trade?')){logTx('Trade annulé par le commissaire');notify('Trade annulé');}};
-window.testNHL=async function(){
-  try{const r=await fetch('https://api-web.nhle.com/v1/schedule/now');
-  if(r.ok){notify('API LNH en ligne!');}else throw new Error();}
-  catch{notify('API LNH non disponible');}
-};
+window.cancelTrade=function(){if(confirm('Annuler le dernier trade?')){logTx('Trade annule par le commissaire');notify('Trade annule');}};
+window.testNHL=async function(){try{const r=await fetch('https://api-web.nhle.com/v1/schedule/now');if(r.ok){notify('API LNH en ligne!');}else throw new Error();}catch{notify('API LNH non disponible');}};
 window.filterW=function(){const s=document.getElementById('ws').value.toLowerCase();const pos=document.getElementById('wp').value;renderWVList(wv.filter(p=>p.name.toLowerCase().includes(s)&&(pos===''||p.pos===pos)));};
-window.refreshAll=async function(){notify('Actualisation...');await loadAll();notify('Données actualisées!');};
+window.refreshAll=async function(){notify('Actualisation...');await loadAll();notify('Donnees actualisees!');};
+window.recalc=async function(){await loadDGs();renderClassement();renderDGs();notify('Points recalcules');};
+window.refreshW=async function(){await loadWV();renderWV();notify('Waiver actualise');};
 window.showView=function(v){
   document.querySelectorAll('[id^="view-"]').forEach(e=>e.classList.add('hidden'));
   document.getElementById('view-'+v).classList.remove('hidden');
@@ -2220,7 +1586,6 @@ window.showView=function(v){
   const btns=document.querySelectorAll('.nav-btn');
   if(btns[map[v]])btns[map[v]].classList.add('active');
 };
-
 let nt;
 window.notify=function(msg){clearTimeout(nt);document.getElementById('ntxt').textContent=msg;document.getElementById('notif').classList.add('show');nt=setTimeout(()=>document.getElementById('notif').classList.remove('show'),3500);};
 </script>
