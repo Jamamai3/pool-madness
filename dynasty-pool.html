@@ -2027,7 +2027,8 @@ window.openPrivateChat = function(){
   document.getElementById('privateDgList').innerHTML = others.length ? others.map(d=>{
     const c=COLORS[d.color||0];
     const ini=(d.name||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
-    return `<div class="swap-player" onclick="startPrivateChat('${d.id}','${(d.name||d.id).replace(/'/g,'')}")">
+    const safeName=(d.name||d.id).replace(/['"]/g,'');
+    return `<div class="swap-player" onclick="startPrivateChat('${d.id}','${safeName}')">
       <div class="dgav" style="background:${c}22;color:${c};width:32px;height:32px;font-size:11px;">${ini}</div>
       <span style="font-weight:600;font-size:13px;">${d.name||d.id}</span>
     </div>`;
@@ -2066,12 +2067,26 @@ function addPrivateChatTab(convId, name, otherUid){
   container.id = 'chat_'+convId;
   container.className = 'hidden chat-container';
   container.style.marginTop = '0';
-  container.innerHTML = `
-    <div class="chat-messages" id="msgs_${convId}"><div class="empty"><div class="spin"></div></div></div>
-    <div class="chat-input-row">
-      <textarea class="chat-input" id="input_${convId}" placeholder="Message privé à ${name}..." rows="1" onkeydown="chatKeyDown(event,'${convId}')"></textarea>
-      <button class="chat-send" onclick="sendChatMsg('${convId}')">Envoyer</button>
-    </div>`;
+  const msgs = document.createElement('div');
+  msgs.className = 'chat-messages';
+  msgs.id = 'msgs_'+convId;
+  msgs.innerHTML = '<div class="empty"><div class="spin"></div></div>';
+  const inputRow = document.createElement('div');
+  inputRow.className = 'chat-input-row';
+  const ta = document.createElement('textarea');
+  ta.className = 'chat-input';
+  ta.id = 'input_'+convId;
+  ta.placeholder = 'Message privé à '+name+'...';
+  ta.rows = 1;
+  ta.onkeydown = (e)=>chatKeyDown(e, convId);
+  const sendBtn = document.createElement('button');
+  sendBtn.className = 'chat-send';
+  sendBtn.textContent = 'Envoyer';
+  sendBtn.onclick = ()=>sendChatMsg(convId);
+  inputRow.appendChild(ta);
+  inputRow.appendChild(sendBtn);
+  container.appendChild(msgs);
+  container.appendChild(inputRow);
   document.getElementById('privateChatContainers').appendChild(container);
 }
 
