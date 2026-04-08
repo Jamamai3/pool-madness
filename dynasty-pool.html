@@ -1553,6 +1553,30 @@ function renderDraftPickList(){
   }).join('');
 }
 
+
+const POS_LIMITS = { forwards: 16, defense: 10, goalies: 4 };
+
+function getMyDraftCounts(){
+  if(!currentUser || !draftState) return {forwards:0, defense:0, goalies:0};
+  const myPicks = draftState.picks.filter(p=>p.uid===currentUser.uid && p.selected);
+  let f=0, d=0, g=0;
+  myPicks.forEach(p=>{
+    const player = NHL_PLAYERS.find(pl=>pl.name===p.selected);
+    if(!player) return;
+    if(player.pos==='G') g++;
+    else if(player.pos==='D') d++;
+    else f++;
+  });
+  return {forwards:f, defense:d, goalies:g};
+}
+
+function isPositionMaxed(pos){
+  const counts = getMyDraftCounts();
+  if(pos==='G') return counts.goalies >= POS_LIMITS.goalies;
+  if(pos==='D') return counts.defense >= POS_LIMITS.defense;
+  return counts.forwards >= POS_LIMITS.forwards;
+}
+
 function renderDraftPlayers(){
   const search = (document.getElementById('draftSearch')?.value||'').toLowerCase();
   const pos = document.getElementById('draftPosFilter')?.value||'';
@@ -1564,19 +1588,33 @@ function renderDraftPlayers(){
     return matchSearch && matchPos;
   }).sort((a,b)=>b.rating-a.rating);
 
-  document.getElementById('draftPlayerList').innerHTML = filtered.map(p=>{
+  // Show position counts for current DG
+  const counts = getMyDraftCounts();
+  const posBar = `<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+    <span style="font-size:11px;padding:3px 8px;border-radius:5px;background:${counts.forwards>=POS_LIMITS.forwards?'rgba(239,68,68,0.2)':'rgba(245,158,11,0.1)'};color:${counts.forwards>=POS_LIMITS.forwards?'var(--red)':'var(--text2)'};">ATT: ${counts.forwards}/${POS_LIMITS.forwards}</span>
+    <span style="font-size:11px;padding:3px 8px;border-radius:5px;background:${counts.defense>=POS_LIMITS.defense?'rgba(239,68,68,0.2)':'rgba(139,92,246,0.1)'};color:${counts.defense>=POS_LIMITS.defense?'var(--red)':'var(--text2)'};">DEF: ${counts.defense}/${POS_LIMITS.defense}</span>
+    <span style="font-size:11px;padding:3px 8px;border-radius:5px;background:${counts.goalies>=POS_LIMITS.goalies?'rgba(239,68,68,0.2)':'rgba(200,16,46,0.1)'};color:${counts.goalies>=POS_LIMITS.goalies?'var(--red)':'var(--text2)'};">GOAL: ${counts.goalies}/${POS_LIMITS.goalies}</span>
+  </div>`;
+
+  const listHtml = filtered.map(p=>{
     const drafted = draftedPlayers[p.name];
-    return `<div class="draft-player-item ${drafted?'drafted':''}" onclick="${drafted||!isMyTurn?'':"pickPlayer('"+p.name+"')"}">
+    const maxed = isMyTurn && !drafted && isPositionMaxed(p.pos);
+    const blocked = drafted || maxed;
+    return `<div class="draft-player-item ${drafted?'drafted':maxed?'drafted':''}" onclick="${blocked||!isMyTurn?'':"pickPlayer('"+p.name+"')"}">
       <span class="pos pos-${p.pos}" style="font-size:9px;padding:1px 5px;">${p.pos}</span>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:600;font-size:13px;">${p.name} <span style="font-size:10px;color:var(--text3);">${p.team}</span></div>
         ${drafted?'<div style="font-size:10px;color:var(--text3);">→ '+drafted+'</div>':''}
+        ${maxed?'<div style="font-size:10px;color:var(--red);">Maximum atteint pour cette position</div>':''}
       </div>
-      ${!drafted&&isMyTurn?'<button class="btn btn-p" style="font-size:10px;padding:4px 10px;">Choisir</button>':''}
-      ${!drafted&&!isMyTurn?'<span style="font-size:10px;color:var(--text3);">⭐'+p.rating+'</span>':''}
+      ${!blocked&&isMyTurn?'<button class="btn btn-p" style="font-size:10px;padding:4px 10px;">Choisir</button>':''}
+      ${!drafted&&!maxed&&!isMyTurn?'<span style="font-size:10px;color:var(--text3);">⭐'+p.rating+'</span>':''}
       ${drafted?'<span style="font-size:10px;color:var(--text3);">Repêché</span>':''}
+      ${maxed&&!drafted?'<span style="font-size:10px;color:var(--red);">Max atteint</span>':''}
     </div>`;
   }).join('');
+
+  document.getElementById('draftPlayerList').innerHTML = (isMyTurn ? posBar : '') + listHtml;
 }
 
 window.filterDraftPlayers = function(){ renderDraftPlayers(); };
@@ -1587,6 +1625,10 @@ window.pickPlayer = async function(playerName){
   if(!curr||curr.uid!==currentUser.uid){notify('Ce nest pas ton tour');return;}
   const player = NHL_PLAYERS.find(p=>p.name===playerName);
   if(!player||draftedPlayers[playerName]){notify('Joueur non disponible');return;}
+  if(isPositionMaxed(player.pos)){
+    const posName = player.pos==='G'?'gardiens':player.pos==='D'?'défenseurs':'attaquants';
+    notify('Maximum de '+posName+' atteint pour ton roster!');return;
+  }
   // Assign player to DG roster
   draftedPlayers[playerName] = curr.name;
   draftState.picks[draftState.currentPick].selected = playerName;
