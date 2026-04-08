@@ -53,7 +53,7 @@
   .signout-btn:hover{color:var(--red);}
 
   /* LAYOUT */
-  .layout{display:grid;grid-template-columns:228px 1fr;min-height:calc(100vh - 52px);}
+  .layout{display:grid;grid-template-columns:228px 1fr;min-height:calc(100vh - 52px);overflow:visible;}
   .sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:12px 10px;overflow-y:auto;}
   .slabel{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;padding:0 3px;}
   .dgcard{display:flex;align-items:center;gap:7px;padding:7px 8px;border-radius:8px;cursor:pointer;transition:all .15s;margin-bottom:3px;border:1px solid transparent;}
@@ -68,7 +68,7 @@
   .dgrank.top{color:var(--gold);}
   .you-badge{font-size:9px;background:var(--accent);color:white;padding:1px 5px;border-radius:3px;font-weight:700;flex-shrink:0;}
 
-  .main{padding:18px;overflow-y:auto;}
+  .main{padding:18px;overflow-y:visible;}
   .hidden{display:none!important;}
 
   /* STATS */
@@ -330,7 +330,7 @@
           <div class="scard"><div class="slb">Réserve / IR</div><div class="sv" id="s4">—</div><div class="ss">sur 10 spots</div></div>
         </div>
         <div id="rosterPosBar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
-        <div style="position:sticky;top:52px;background:var(--bg);z-index:10;padding-bottom:10px;">
+        <div style="position:sticky;top:52px;background:var(--bg);z-index:10;padding-bottom:10px;padding-top:4px;margin:0 -18px;padding-left:18px;padding-right:18px;">
           <div class="shdr" style="margin-bottom:9px;"><div class="stitle">Matchs du jour</div><span style="font-size:11px;color:var(--text3)" id="mdate">—</span></div>
           <div class="mgrid" id="mgrid"><div class="empty"><div class="spin"></div></div></div>
         </div>
