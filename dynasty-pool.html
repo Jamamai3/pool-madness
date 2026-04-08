@@ -1073,16 +1073,17 @@ async function loadMatches(){
     // Try multiple proxies
     let d = null;
     const proxies = [
+      url => 'https://api.allorigins.win/raw?url='+encodeURIComponent(url),
       url => 'https://corsproxy.io/?'+encodeURIComponent(url),
-      url => 'https://api.allorigins.win/get?url='+encodeURIComponent(url),
+      url => 'https://thingproxy.freeboard.io/fetch/'+url,
     ];
     const nhlUrl = 'https://api-web.nhle.com/v1/score/'+today;
     for(const makeProxy of proxies){
       try{
         const r = await fetch(makeProxy(nhlUrl));
         if(!r.ok) continue;
-        const raw = await r.json();
-        d = raw.contents ? JSON.parse(raw.contents) : raw;
+        const text = await r.text();
+        try{ d = JSON.parse(text); }catch(e2){ continue; }
         if(d && d.games !== undefined) break;
         d = null;
       }catch(e2){ continue; }
@@ -1144,8 +1145,8 @@ async function fetchAllStats(gameIds){
         try{
           const r=await fetch(makeProxy(boxUrl));
           if(!r.ok) continue;
-          const raw=await r.json();
-          d=raw.contents?JSON.parse(raw.contents):raw;
+          const text2=await r.text();
+          try{ d=JSON.parse(text2); }catch(e4){ continue; }
           if(d&&d.playerByGameStats) break;
           d=null;
         }catch(e3){continue;}
@@ -2050,7 +2051,13 @@ function addPrivateChatTab(convId, name, otherUid){
   const tab = document.createElement('button');
   tab.className = 'tab-btn';
   tab.id = 'tab_'+convId;
-  tab.innerHTML = name+' <span class="priv-badge hidden" id="badge_'+convId+'">\u25cf</span> <span onclick="closePrivateTab(event,\u0027'+convId+'\u0027)" style="margin-left:4px;opacity:0.5;font-size:11px;">\u2715</span>';
+  const closeBtn = convId;
+  tab.innerHTML = name+' <span class="priv-badge hidden" id="badge_'+convId+'">&#9679;</span>';
+  const x = document.createElement('span');
+  x.textContent = ' ✕';
+  x.style.cssText = 'margin-left:4px;opacity:0.5;font-size:11px;cursor:pointer;';
+  x.onclick = (e)=>closePrivateTab(e, closeBtn);
+  tab.appendChild(x);
   tab.onclick = ()=>switchChatTab(convId);
   document.getElementById('privateTabs').appendChild(tab);
 
