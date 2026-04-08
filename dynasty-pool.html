@@ -201,6 +201,10 @@
   .chat-input:focus{border-color:var(--accent);}
   .chat-send{background:var(--accent);border:none;color:white;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;}
   .chat-send:hover{opacity:.85;}
+  .tab-btn{padding:8px 14px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .tab-btn:hover{color:var(--text);}
+  .tab-btn.active{border-bottom-color:var(--accent);color:var(--accent2);}
+  .priv-badge{display:inline-block;background:var(--blue2);color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:3px;}
   /* DRAFT */
   .draft-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:960px;max-height:92vh;overflow-y:auto;}
   .draft-header{background:var(--bg);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2;}
@@ -372,14 +376,34 @@
 
       <!-- CHAT -->
       <div id="view-ch" class="hidden">
-        <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
           <div><h1 style="font-size:21px;font-weight:800;margin-bottom:3px;">Chat de ligue</h1><div style="font-size:12px;color:var(--text2);">Discussions entre DGs <span class="fbb">Firebase Live</span></div></div>
+          <button class="btn btn-p" onclick="openPrivateChat()" style="font-size:12px;">✉ Message privé</button>
         </div>
-        <div class="chat-container">
+        <!-- Chat tabs -->
+        <div style="display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:0;">
+          <button class="tab-btn active" id="tabGeneral" onclick="switchChatTab('general')" style="padding:8px 14px;background:transparent;border:none;border-bottom:2px solid var(--accent);color:var(--accent2);font-size:13px;font-weight:600;cursor:pointer;">Général</button>
+          <div id="privateTabs" style="display:flex;gap:4px;"></div>
+        </div>
+        <!-- General chat -->
+        <div id="chatGeneral" class="chat-container" style="margin-top:0;border-radius:0 10px 0 0;">
           <div class="chat-messages" id="chatMessages"><div class="empty"><div class="spin"></div></div></div>
           <div class="chat-input-row">
-            <textarea class="chat-input" id="chatInput" placeholder="Écris un message..." rows="1" onkeydown="chatKeyDown(event)"></textarea>
-            <button class="chat-send" onclick="sendChatMsg()">Envoyer</button>
+            <textarea class="chat-input" id="chatInput" placeholder="Message général..." rows="1" onkeydown="chatKeyDown(event,'general')"></textarea>
+            <button class="chat-send" onclick="sendChatMsg('general')">Envoyer</button>
+          </div>
+        </div>
+        <!-- Private chats (dynamic) -->
+        <div id="privateChatContainers"></div>
+        <!-- DG selector for private chat -->
+        <div class="modal-bg hidden" id="privateChatModal">
+          <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;width:100%;max-width:360px;padding:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <h2 style="font-size:16px;font-weight:800;">Nouveau message privé</h2>
+              <button class="modal-close" onclick="document.getElementById('privateChatModal').classList.add('hidden')">✕</button>
+            </div>
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px;">Choisis un DG:</div>
+            <div id="privateDgList" style="display:flex;flex-direction:column;gap:6px;"></div>
           </div>
         </div>
       </div>
@@ -1914,28 +1938,47 @@ window.markChatRead = function(){
   if(lastMsg) chatLastRead = lastMsg.ts?.seconds||0;
 };
 
-window.sendChatMsg = async function(){
-  const input = document.getElementById('chatInput');
+window.sendChatMsg = async function(channel='general'){
+  const inputId = channel==='general'?'chatInput':'input_'+channel;
+  const input = document.getElementById(inputId);
   const text = (input?.value||'').trim();
   if(!text||!currentUser||isGuest) return;
-  input.value = '';
-  const dg = dgs.find(d=>d.id===currentUser.uid);
+  input.value='';
+  const dg=dgs.find(d=>d.id===currentUser.uid);
+  const msgData={
+    uid:currentUser.uid,
+    author:dg?.name||currentUser.displayName||currentUser.email,
+    colorIdx:dg?.color||0,
+    text,
+    ts:serverTimestamp()
+  };
   try{
-    await addDoc(collection(db,'chat'),{
-      uid: currentUser.uid,
-      author: dg?.name || currentUser.displayName || currentUser.email,
-      colorIdx: dg?.color||0,
-      text,
-      ts: serverTimestamp()
-    });
-    await loadChat();
+    if(channel==='general'){
+      await addDoc(collection(db,'chat'),msgData);
+      await loadChat();
+    } else {
+      // Private message
+      await addDoc(collection(db,'privateChat_'+channel),msgData);
+      // Update index for recipient
+      const parts=channel.split('_');
+      const otherUid=parts.find(p=>p!==currentUser.uid);
+      if(otherUid){
+        await setDoc(doc(db,'privateChats_index_'+otherUid,channel),{
+          participants:[currentUser.uid,otherUid],
+          lastMsg:text,
+          hasUnread:true,
+          ts:serverTimestamp()
+        },{merge:true});
+      }
+      await loadPrivateChat(channel);
+    }
   }catch(e){notify('Erreur envoi: '+e.message);}
 };
 
-window.chatKeyDown = function(e){
-  if(e.key==='Enter' && !e.shiftKey){
+window.chatKeyDown = function(e, channel='general'){
+  if(e.key==='Enter'&&!e.shiftKey){
     e.preventDefault();
-    sendChatMsg();
+    sendChatMsg(channel);
   }
 };
 
@@ -1958,7 +2001,184 @@ function startChatPolling(){
         checkChatBadge();
       }
     }
+    await checkPrivateMessages();
   }, 15000);
+}
+
+
+
+// ========================
+// PRIVATE CHAT
+// ========================
+
+let privateChats = {}; // {conversationId: [messages]}
+let activePrivateChats = []; // open conversation ids
+let activeChatTab = 'general';
+let unreadPrivate = {}; // {conversationId: count}
+
+function getConversationId(uid1, uid2){
+  return [uid1,uid2].sort().join('_');
+}
+
+window.openPrivateChat = function(){
+  if(isGuest||!currentUser){notify('Connecte-toi pour envoyer des messages privés');return;}
+  const others = dgs.filter(d=>d.id!==currentUser.uid);
+  document.getElementById('privateDgList').innerHTML = others.length ? others.map(d=>{
+    const c=COLORS[d.color||0];
+    const ini=(d.name||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
+    return `<div class="swap-player" onclick="startPrivateChat('${d.id}','${(d.name||d.id).replace(/'/g,'')}")">
+      <div class="dgav" style="background:${c}22;color:${c};width:32px;height:32px;font-size:11px;">${ini}</div>
+      <span style="font-weight:600;font-size:13px;">${d.name||d.id}</span>
+    </div>`;
+  }).join('') : '<div class="empty">Aucun autre DG disponible</div>';
+  document.getElementById('privateChatModal').classList.remove('hidden');
+};
+
+window.startPrivateChat = async function(otherUid, otherName){
+  document.getElementById('privateChatModal').classList.add('hidden');
+  const convId = getConversationId(currentUser.uid, otherUid);
+  if(!activePrivateChats.includes(convId)){
+    activePrivateChats.push(convId);
+    addPrivateChatTab(convId, otherName, otherUid);
+  }
+  switchChatTab(convId);
+  await loadPrivateChat(convId);
+};
+
+function addPrivateChatTab(convId, name, otherUid){
+  // Add tab button
+  const tab = document.createElement('button');
+  tab.className = 'tab-btn';
+  tab.id = 'tab_'+convId;
+  tab.innerHTML = name+' <span class="priv-badge hidden" id="badge_'+convId+'">\u25cf</span> <span onclick="closePrivateTab(event,\u0027'+convId+'\u0027)" style="margin-left:4px;opacity:0.5;font-size:11px;">\u2715</span>';
+  tab.onclick = ()=>switchChatTab(convId);
+  document.getElementById('privateTabs').appendChild(tab);
+
+  // Add chat container
+  const container = document.createElement('div');
+  container.id = 'chat_'+convId;
+  container.className = 'hidden chat-container';
+  container.style.marginTop = '0';
+  container.innerHTML = `
+    <div class="chat-messages" id="msgs_${convId}"><div class="empty"><div class="spin"></div></div></div>
+    <div class="chat-input-row">
+      <textarea class="chat-input" id="input_${convId}" placeholder="Message privé à ${name}..." rows="1" onkeydown="chatKeyDown(event,'${convId}')"></textarea>
+      <button class="chat-send" onclick="sendChatMsg('${convId}')">Envoyer</button>
+    </div>`;
+  document.getElementById('privateChatContainers').appendChild(container);
+}
+
+window.closePrivateTab = function(e, convId){
+  e.stopPropagation();
+  activePrivateChats = activePrivateChats.filter(id=>id!==convId);
+  document.getElementById('tab_'+convId)?.remove();
+  document.getElementById('chat_'+convId)?.remove();
+  if(activeChatTab===convId) switchChatTab('general');
+};
+
+window.switchChatTab = function(tab){
+  activeChatTab = tab;
+  // Hide all
+  document.getElementById('chatGeneral').classList.add('hidden');
+  document.querySelectorAll('[id^="chat_"]').forEach(el=>el.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  // Show selected
+  if(tab==='general'){
+    document.getElementById('chatGeneral').classList.remove('hidden');
+    document.getElementById('tabGeneral').classList.add('active');
+  } else {
+    const el=document.getElementById('chat_'+tab);
+    if(el) el.classList.remove('hidden');
+    const tabBtn=document.getElementById('tab_'+tab);
+    if(tabBtn) tabBtn.classList.add('active');
+    // Clear unread badge
+    const badge=document.getElementById('badge_'+tab);
+    if(badge) badge.classList.add('hidden');
+    unreadPrivate[tab]=0;
+    updateChatNavBadge();
+    // Load messages
+    loadPrivateChat(tab);
+  }
+};
+
+async function loadPrivateChat(convId){
+  try{
+    const s = await getDocs(collection(db,'privateChat_'+convId));
+    let msgs=[];
+    s.forEach(d=>msgs.push({id:d.id,...d.data()}));
+    msgs.sort((a,b)=>(a.ts?.seconds||0)-(b.ts?.seconds||0));
+    privateChats[convId]=msgs;
+    renderPrivateChat(convId);
+  }catch(e){}
+}
+
+function renderPrivateChat(convId){
+  const box=document.getElementById('msgs_'+convId);
+  if(!box) return;
+  const msgs=privateChats[convId]||[];
+  if(!msgs.length){box.innerHTML='<div class="empty">Début de la conversation privée</div>';return;}
+  box.innerHTML=msgs.map(m=>{
+    const isMe=currentUser&&m.uid===currentUser.uid;
+    const c=COLORS[(m.colorIdx||0)%10];
+    const ini=(m.author||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
+    const time=m.ts?new Date(m.ts.seconds*1000).toLocaleTimeString('fr-CA',{hour:'2-digit',minute:'2-digit'}):'';
+    return `<div class="chat-msg ${isMe?'mine':''}">
+      <div class="chat-av" style="background:${c}22;color:${c}">${ini}</div>
+      <div>
+        ${!isMe?'<div style="font-size:10px;color:var(--text3);margin-bottom:2px;">'+m.author+'</div>':''}
+        <div class="chat-bubble">${escapeHtml(m.text)}</div>
+        <div class="chat-meta">${time}</div>
+      </div>
+    </div>`;
+  }).join('');
+  box.scrollTop=box.scrollHeight;
+}
+
+function updateChatNavBadge(){
+  const badge=document.getElementById('chatBadge');
+  if(!badge) return;
+  const total=Object.values(unreadPrivate).reduce((a,b)=>a+b,0);
+  if(total>0){badge.textContent='●';badge.style.display='inline';}
+  else{badge.style.display='none';}
+}
+
+async function checkPrivateMessages(){
+  if(!currentUser||isGuest) return;
+  // Check all active conversations for new messages
+  for(const convId of activePrivateChats){
+    const prevCount=(privateChats[convId]||[]).length;
+    await loadPrivateChat(convId);
+    const newCount=(privateChats[convId]||[]).length;
+    if(newCount>prevCount && activeChatTab!==convId){
+      const diff=newCount-prevCount;
+      unreadPrivate[convId]=(unreadPrivate[convId]||0)+diff;
+      const badge=document.getElementById('badge_'+convId);
+      if(badge){badge.textContent=unreadPrivate[convId];badge.classList.remove('hidden');}
+      updateChatNavBadge();
+    }
+  }
+  // Check if we have any unread private messages from other DGs
+  // by scanning recent private chats involving our uid
+  try{
+    const allConvs=await getDocs(collection(db,'privateChats_index_'+currentUser.uid));
+    allConvs.forEach(d=>{
+      const convId=d.id;
+      if(!activePrivateChats.includes(convId)){
+        const data=d.data();
+        const otherUid=data.participants?.find(p=>p!==currentUser.uid);
+        const otherName=dgs.find(d2=>d2.id===otherUid)?.name||'DG';
+        if(data.hasUnread){
+          // Auto-open the tab
+          activePrivateChats.push(convId);
+          addPrivateChatTab(convId,otherName,otherUid);
+          unreadPrivate[convId]=1;
+          const badge=document.getElementById('badge_'+convId);
+          if(badge){badge.classList.remove('hidden');}
+          updateChatNavBadge();
+        }
+      }
+    });
+  }catch(e){}
 }
 
 
