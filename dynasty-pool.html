@@ -1150,7 +1150,18 @@ window.mvAct=async function(i){
   if(ra.length>=20){
     // Show swap modal
     document.getElementById('swapTitle').textContent='Monter '+playerToUp.name+' — qui descend?';
-    document.getElementById('swapList').innerHTML=ra.map((p,j)=>`
+    // Filter by same position group
+    const isForward = ['C','LW','RW'].includes(playerToUp.pos);
+    const isDefense = playerToUp.pos === 'D';
+    const isGoalie = playerToUp.pos === 'G';
+    const eligible = ra.map((p,j)=>({p,j})).filter(({p})=>{
+      if(isForward) return ['C','LW','RW'].includes(p.pos);
+      if(isDefense) return p.pos === 'D';
+      if(isGoalie) return p.pos === 'G';
+      return true;
+    });
+    const posLabel = isForward?'attaquant':isDefense?'défenseur':'gardien';
+    document.getElementById('swapList').innerHTML = eligible.length ? eligible.map(({p,j})=>`
       <div class="swap-player" onclick="doSwap(${i},${j})">
         <span class="pos pos-${p.pos}" style="font-size:9px;padding:1px 5px;">${p.pos}</span>
         <div style="flex:1;">
@@ -1158,7 +1169,7 @@ window.mvAct=async function(i){
           <div style="font-size:11px;color:var(--text2);">${p.team} • ${p.seasonPts} pts saison</div>
         </div>
         <span style="font-size:11px;color:var(--accent2);">↓ Réserve</span>
-      </div>`).join('');
+      </div>`).join('') : '<div class="empty">Aucun '+posLabel+' actif à descendre</div>';
     document.getElementById('swapModal').classList.remove('hidden');
     return;
   }
