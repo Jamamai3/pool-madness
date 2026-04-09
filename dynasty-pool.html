@@ -1851,7 +1851,8 @@ async function fetchWithProxy(url) {
   ];
   for (const makeProxy of proxies) {
     try {
-      const r = await fetch(makeProxy(url), {signal: AbortSignal.timeout(8000)});
+      const ctrl = new AbortController(); const t = setTimeout(()=>ctrl.abort(), 8000);
+      const r = await fetch(makeProxy(url), {signal: ctrl.signal}); clearTimeout(t);
       if (!r.ok) continue;
       const text = await r.text();
       return JSON.parse(text);
@@ -1922,7 +1923,8 @@ async function loadNHLPlayers() {
         const url = `https://api-web.nhle.com/v1/roster/${team}/${SEASON}`;
         for (const makeProxy of proxies) {
           try {
-            const r = await fetch(makeProxy(url), {signal: AbortSignal.timeout(10000)});
+            const controller = new AbortController(); const tid = setTimeout(()=>controller.abort(), 10000);
+      const r = await fetch(makeProxy(url), {signal: controller.signal}); clearTimeout(tid);
             if (!r.ok) continue;
             const text = await r.text();
             const data = JSON.parse(text);
