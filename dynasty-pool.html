@@ -445,6 +445,7 @@
             <button class="ab" style="width:100%;text-align:left;" onclick="processExpiredClaims()">⚡ Traiter réclamations expirées</button>
             <button class="ab" style="width:100%;text-align:left;color:var(--red);border-color:rgba(239,68,46,.2);" onclick="resetDraft()">↺ Reset le draft</button>
             <button class="ab" style="width:100%;text-align:left;" onclick="testNHL()">⚡ Tester API LNH</button>
+            <button class="ab" style="width:100%;text-align:left;" onclick="clearNHLCache()">🗑 Vider cache joueurs LNH</button>
             <button class="ab" style="width:100%;text-align:left;color:var(--red);border-color:rgba(239,68,46,.2);" onclick="cancelTrade()">✕ Annuler dernier trade</button>
           </div></div>
           <div class="ac"><h3>Barème de points</h3><div style="display:flex;flex-direction:column;gap:7px;font-size:13px;">
@@ -545,8 +546,10 @@
             </select>
             <select id="draftSortBy" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:12px;" onchange="filterDraftPlayers()">
               <option value="pts">Trier: Points</option>
+              <option value="goals">Trier: Buts</option>
+              <option value="assists">Trier: Passes</option>
               <option value="name">Trier: Nom A-Z</option>
-              <option value="team">Trier: Équipe</option>
+              <option value="team">Trier: Équipe A-Z</option>
             </select>
           </div>
           <div id="draftPickForBar" style="display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--gold);display:flex;align-items:center;justify-content:space-between;">
@@ -1857,6 +1860,29 @@ async function fetchWithProxy(url) {
   return null;
 }
 
+// Extraire les joueurs d'un roster NHL
+function parseRosterTeam(data, team) {
+  const extracted = [];
+  const processGroup = (group, defaultPos) => {
+    (data[group] || []).forEach(p => {
+      const firstName = p.firstName?.default || p.firstName || '';
+      const lastName = p.lastName?.default || p.lastName || '';
+      const name = (firstName + ' ' + lastName).trim();
+      if (!name) return;
+      let pos = defaultPos;
+      if (!pos) {
+        const code = p.positionCode || 'C';
+        pos = ['L','LW'].includes(code) ? 'LW' : ['R','RW'].includes(code) ? 'RW' : 'C';
+      }
+      extracted.push({ name, team, pos, playerId: p.id, number: p.sweaterNumber || 0, seasonPts: 0, gamesPlayed: 0 });
+    });
+  };
+  processGroup('forwards', null);
+  processGroup('defensemen', 'D');
+  processGroup('goalies', 'G');
+  return extracted;
+}
+
 async function loadNHLPlayers() {
   if (nhlPlayersLoaded || nhlPlayersLoading) return;
   nhlPlayersLoading = true;
@@ -1867,7 +1893,7 @@ async function loadNHLPlayers() {
     if (cacheSnap.exists()) {
       const data = cacheSnap.data();
       const age = Date.now() - (data.cachedAt?.seconds || 0) * 1000;
-      if (age < 24 * 3600 * 1000 && data.players?.length > 100) {
+      if (age < 24 * 3600 * 1000 && data.players?.length > 500) {
         NHL_PLAYERS = data.players;
         nhlPlayersLoaded = true;
         nhlPlayersLoading = false;
@@ -1877,57 +1903,49 @@ async function loadNHLPlayers() {
     }
   } catch(e) {}
 
-  updateDraftLoadingUI(0, NHL_TEAMS_LIST.length, false);
+  updateDraftLoadingUI(0, 0, false);
 
-  const players = [];
+  const allPlayers = [];
   let teamsLoaded = 0;
+  const BATCH_SIZE = 4; // Charger 4 équipes en parallèle
 
-  // Charger les rosters des 32 équipes
-  for (const team of NHL_TEAMS_LIST) {
-    try {
-      const data = await fetchWithProxy(`https://api-web.nhle.com/v1/roster/${team}/${SEASON}`);
-      if (data) {
-        const processGroup = (group, pos) => {
-          (data[group] || []).forEach(p => {
-            const firstName = p.firstName?.default || '';
-            const lastName = p.lastName?.default || '';
-            const name = (firstName + ' ' + lastName).trim();
-            if (!name) return;
-            players.push({
-              name,
-              team,
-              pos,
-              playerId: p.id,
-              number: p.sweaterNumber || 0,
-              seasonPts: 0,
-              gamesPlayed: 0,
-            });
-          });
-        };
-        processGroup('forwards', null); // On assignera C/LW/RW depuis positionCode
-        processGroup('defensemen', 'D');
-        processGroup('goalies', 'G');
+  // Charger par batches de 4 équipes simultanément
+  for (let i = 0; i < NHL_TEAMS_LIST.length; i += BATCH_SIZE) {
+    const batch = NHL_TEAMS_LIST.slice(i, i + BATCH_SIZE);
+    const results = await Promise.allSettled(
+      batch.map(async team => {
+        // Essayer les deux proxies
+        const proxies = [
+          u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+          u => 'https://corsproxy.io/?' + encodeURIComponent(u),
+        ];
+        const url = `https://api-web.nhle.com/v1/roster/${team}/${SEASON}`;
+        for (const makeProxy of proxies) {
+          try {
+            const r = await fetch(makeProxy(url), {signal: AbortSignal.timeout(10000)});
+            if (!r.ok) continue;
+            const text = await r.text();
+            const data = JSON.parse(text);
+            if (data && (data.forwards || data.defensemen || data.goalies)) {
+              return { team, players: parseRosterTeam(data, team) };
+            }
+          } catch(e) { continue; }
+        }
+        return { team, players: [] }; // Équipe non chargée
+      })
+    );
 
-        // Retraitement — forwards avec positionCode
-        (data.forwards || []).forEach(p => {
-          const firstName = p.firstName?.default || '';
-          const lastName = p.lastName?.default || '';
-          const name = (firstName + ' ' + lastName).trim();
-          if (!name) return;
-          const idx = players.findIndex(pl => pl.name === name && pl.team === team);
-          if (idx !== -1) {
-            const code = p.positionCode || 'C';
-            players[idx].pos = ['L','LW'].includes(code) ? 'LW' : ['R','RW'].includes(code) ? 'RW' : 'C';
-          }
-        });
+    // Traiter les résultats du batch
+    for (const result of results) {
+      if (result.status === 'fulfilled' && result.value.players.length > 0) {
+        allPlayers.push(...result.value.players);
       }
-    } catch(e) {}
-    teamsLoaded++;
-    updateDraftLoadingUI(players.length, teamsLoaded, false);
+      teamsLoaded++;
+    }
+    updateDraftLoadingUI(allPlayers.length, teamsLoaded, false);
   }
 
-  if (players.length < 50) {
-    // Fallback si l'API a échoué
+  if (allPlayers.length < 100) {
     NHL_PLAYERS = NHL_PLAYERS_FALLBACK;
     nhlPlayersLoaded = true;
     nhlPlayersLoading = false;
@@ -1936,32 +1954,45 @@ async function loadNHLPlayers() {
     return;
   }
 
-  // Charger les stats de points (skaters leaders)
-  try {
-    const statsData = await fetchWithProxy(`https://api-web.nhle.com/v1/skater-stats-leaders/${SEASON}/2?categories=points&limit=200`);
-    if (statsData?.points) {
-      statsData.points.forEach(s => {
+  // Charger les stats — plusieurs endpoints pour avoir plus de joueurs
+  const statsEndpoints = [
+    `https://api-web.nhle.com/v1/skater-stats-leaders/${SEASON}/2?categories=points&limit=300`,
+    `https://api-web.nhle.com/v1/skater-stats-leaders/${SEASON}/2?categories=goals&limit=150`,
+    `https://api-web.nhle.com/v1/skater-stats-leaders/${SEASON}/2?categories=assists&limit=150`,
+  ];
+  for (const endpoint of statsEndpoints) {
+    try {
+      const statsData = await fetchWithProxy(endpoint);
+      if (!statsData) continue;
+      const category = Object.keys(statsData)[0]; // 'points', 'goals', 'assists'
+      (statsData[category] || []).forEach(s => {
         const firstName = s.firstName?.default || '';
         const lastName = s.lastName?.default || '';
         const name = (firstName + ' ' + lastName).trim();
-        const idx = players.findIndex(p => p.name === name);
+        const idx = allPlayers.findIndex(p => p.name === name);
         if (idx !== -1) {
-          players[idx].seasonPts = s.value || 0;
-          players[idx].gamesPlayed = s.gamesPlayed || 0;
+          if (category === 'points') {
+            allPlayers[idx].seasonPts = s.value || 0;
+            allPlayers[idx].gamesPlayed = s.gamesPlayed || 0;
+          } else if (category === 'goals') {
+            allPlayers[idx].goals = s.value || 0;
+          } else if (category === 'assists') {
+            allPlayers[idx].assists = s.value || 0;
+          }
         }
       });
-    }
-  } catch(e) {}
+    } catch(e) {}
+  }
 
-  // Dédupliquer (un joueur peut avoir changé d'équipe)
+  // Dédupliquer
   const seen = new Set();
-  const unique = players.filter(p => {
+  const unique = allPlayers.filter(p => {
     if (seen.has(p.name)) return false;
     seen.add(p.name);
     return true;
   });
 
-  NHL_PLAYERS = unique.sort((a, b) => b.seasonPts - a.seasonPts);
+  NHL_PLAYERS = unique.sort((a, b) => (b.seasonPts||0) - (a.seasonPts||0));
   nhlPlayersLoaded = true;
   nhlPlayersLoading = false;
 
@@ -1975,7 +2006,7 @@ async function loadNHLPlayers() {
   } catch(e) {}
 
   updateDraftLoadingUI(NHL_PLAYERS.length, NHL_TEAMS_LIST.length, true);
-  notify('✅ ' + NHL_PLAYERS.length + ' joueurs LNH chargés depuis l\'API!');
+  notify('✅ ' + NHL_PLAYERS.length + ' joueurs LNH chargés!');
 }
 
 function updateDraftLoadingUI(playerCount, teamsLoaded, done) {
@@ -2189,7 +2220,9 @@ function renderDraftPlayers(){
   const sortBy = document.getElementById('draftSortBy')?.value || 'pts';
   filtered.sort((a,b)=>{
     if(sortBy==='name') return a.name.localeCompare(b.name);
-    if(sortBy==='team') return (a.team||'').localeCompare(b.team||'');
+    if(sortBy==='team') return (a.team||'').localeCompare(b.team||'') || (b.seasonPts||0)-(a.seasonPts||0);
+    if(sortBy==='goals') return (b.goals||0)-(a.goals||0);
+    if(sortBy==='assists') return (b.assists||0)-(a.assists||0);
     return (b.seasonPts||0)-(a.seasonPts||0);
   });
   const counts=getMyDraftCounts();
@@ -2516,6 +2549,14 @@ async function checkPrivateMessages(){
 
 window.cancelTrade=function(){if(confirm('Annuler le dernier trade?')){logTx('Trade annulé par le commissaire');notify('Trade annulé');}};
 window.testNHL=async function(){try{const r=await fetch('https://api-web.nhle.com/v1/schedule/now');if(r.ok){notify('API LNH en ligne!');}else throw new Error();}catch{notify('API LNH non disponible');}};
+window.clearNHLCache=async function(){
+  if(!confirm('Vider le cache des joueurs LNH?\nLa prochaine ouverture du draft va recharger les ~700 joueurs depuis l\'API.')) return;
+  try{
+    await setDoc(doc(db,'config','nhlRoster'),{players:[],cachedAt:null,count:0});
+    nhlPlayersLoaded=false; nhlPlayersLoading=false; NHL_PLAYERS=[];
+    notify('✅ Cache vidé — les joueurs seront rechargés au prochain draft');
+  }catch(e){notify('Erreur: '+e.message);}
+};
 window.refreshAll=async function(){notify('Actualisation...');await loadAll();notify('Données actualisées!');};
 window.recalc=async function(){await loadDGs();renderClassement();renderDGs();notify('Points recalculés');};
 window.showView=function(v){
