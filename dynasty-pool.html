@@ -512,7 +512,16 @@
             <div><div style="font-size:12px;color:var(--text2);margin-bottom:5px;">Type de draft</div><select id="draftType" style="width:100%;padding:8px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:13px;"><option value="serpentin">Serpentin (recommandé)</option><option value="lineaire">Linéaire</option></select></div>
           </div>
           <button class="btn btn-p" style="width:100%;margin-top:16px;padding:10px;" onclick="startDraft()">🏒 Lancer le draft</button>
+          <button class="btn btn-r" style="width:100%;margin-top:8px;padding:8px;" onclick="resetDraft()">↺ Reset le draft</button>
         </div>
+      </div>
+      <!-- Verification rosters -->
+      <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);">État des rosters avant draft</div>
+          <button class="ab" style="font-size:11px;" onclick="checkRosterReadiness()">↻ Vérifier</button>
+        </div>
+        <div id="rosterReadinessPanel"><div style="font-size:12px;color:var(--text3);">Clique sur Vérifier pour voir si les DGs sont prêts.</div></div>
       </div>
     </div>
     <div id="draftLive" class="hidden">
@@ -1719,8 +1728,56 @@ window.dragStart=function(e){dragIdx=draftOrder.indexOf(e.currentTarget.dataset.
 window.dragOver=function(e){e.preventDefault();};
 window.dropDG=function(e,toIdx){e.preventDefault();document.querySelectorAll('.dg-order-row').forEach(r=>r.style.opacity='1');const fromUid=draftOrder[dragIdx];if(dragIdx===-1||dragIdx===toIdx)return;draftOrder.splice(dragIdx,1);draftOrder.splice(toIdx,0,fromUid);renderDraftOrderSetup();};
 
+window.checkRosterReadiness = async function(){
+  const panel = document.getElementById('rosterReadinessPanel');
+  panel.innerHTML = '<div style="font-size:12px;color:var(--text2);"><div class="spin" style="display:inline-block;margin-right:6px;"></div>Vérification...</div>';
+  const MAX_ACTIF = 5; // Seuil max de joueurs actifs pour considérer le roster "prêt"
+  const results = [];
+  let allReady = true;
+  for(const dg of dgs){
+    try{
+      const snap = await getDoc(doc(db,'rosters',dg.id));
+      const actif = snap.exists() ? (snap.data().actif||[]).length : 0;
+      const reserve = snap.exists() ? (snap.data().reserve||[]).length : 0;
+      const total = actif + reserve;
+      const ready = total <= MAX_ACTIF;
+      if(!ready) allReady = false;
+      results.push({dg, actif, reserve, total, ready});
+    }catch(e){ results.push({dg, actif:0, reserve:0, total:0, ready:true}); }
+  }
+  const summary = allReady
+    ? '<div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:7px;padding:8px 12px;font-size:12px;color:var(--green);margin-bottom:8px;">✅ Tous les DGs sont prêts — tu peux lancer le draft!</div>'
+    : '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:7px;padding:8px 12px;font-size:12px;color:var(--gold);margin-bottom:8px;">⚠️ Certains DGs ont encore trop de joueurs — ils doivent couper avant le draft.</div>';
+  panel.innerHTML = summary + results.map(r=>{
+    const c = COLORS[r.dg.color||0];
+    const ini = (r.dg.name||'?').split(' ').map(n=>n[0]).join('').slice(0,2);
+    const statusColor = r.ready ? 'var(--green)' : 'var(--gold)';
+    const statusText = r.ready ? '✅ Prêt' : '⚠️ '+r.total+' joueurs';
+    return '<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg3);border-radius:7px;border:1px solid var(--border);">'
+      +'<div class="dgav" style="background:'+c+'22;color:'+c+';width:26px;height:26px;font-size:10px;">'+ini+'</div>'
+      +'<div style="flex:1;font-size:12px;font-weight:600;">'+(r.dg.name||r.dg.email||'—')+'</div>'
+      +'<div style="font-size:11px;color:var(--text2);">'+r.actif+' actifs • '+r.reserve+' réserve</div>'
+      +'<div style="font-size:11px;font-weight:700;color:'+statusColor+';">'+statusText+'</div>'
+      +'</div>';
+  }).join('');
+};
+
 window.startDraft=async function(){
   if(!draftOrder.length){notify('Ajoute des DGs avant de lancer le draft');return;}
+
+  // Vérification des rosters
+  let hasBlocker = false;
+  for(const uid of draftOrder){
+    try{
+      const snap = await getDoc(doc(db,'rosters',uid));
+      const total = snap.exists() ? ((snap.data().actif||[]).length + (snap.data().reserve||[]).length) : 0;
+      if(total > 5){ hasBlocker = true; break; }
+    }catch(e){}
+  }
+  if(hasBlocker){
+    if(!confirm('⚠️ Certains DGs ont encore trop de joueurs dans leur roster.\n\nVérifie l\'état des rosters ci-dessous avant de lancer.\n\nVeux-tu quand même lancer le draft?')) return;
+  }
+
   const rounds=parseInt(document.getElementById('draftRounds').value)||30;
   const timerSec=parseInt(document.getElementById('draftTimerRange').value)||0;
   const type=document.getElementById('draftType').value;
@@ -1728,7 +1785,24 @@ window.startDraft=async function(){
   for(let r=1;r<=rounds;r++){const order=(type==='serpentin'&&r%2===0)?[...draftOrder].reverse():[...draftOrder];order.forEach((uid,i)=>picks.push({round:r,pick:(r-1)*draftOrder.length+i+1,uid,name:dgs.find(d=>d.id===uid)?.name||uid,selected:null}));}
   draftState={status:'active',order:draftOrder,picks,currentPick:0,rounds,timerSec,type,drafted:{},startedAt:new Date().toISOString()};
   draftedPlayers={};
-  try{await setDoc(doc(db,'draft','current'),draftState);notify('Draft lancé! '+draftOrder.length+' DGs, '+rounds+' rondes');showDraftLive();}catch(e){notify('Erreur: '+e.message);}
+  try{
+    await setDoc(doc(db,'draft','current'),draftState);
+    await postSystemChat('🏒 Draft lancé! '+draftOrder.length+' DGs • '+rounds+' rondes • Format '+type);
+    notify('Draft lancé! '+draftOrder.length+' DGs, '+rounds+' rondes');
+    showDraftLive();
+  }catch(e){notify('Erreur: '+e.message);}
+};
+
+window.resetDraft=async function(){
+  if(!isAdmin){notify('Seulement le commissaire');return;}
+  if(!confirm('Réinitialiser le draft?\n\nCeci efface l\'ordre des picks et remet tout à zéro.\nLes rosters des DGs ne sont PAS affectés.')) return;
+  try{
+    await setDoc(doc(db,'draft','current'),{status:'reset', resetAt:serverTimestamp()});
+    draftState=null; draftedPlayers={}; draftOrder=[];
+    nhlPlayersLoaded=false; nhlPlayersLoading=false; NHL_PLAYERS=[];
+    showDraftSetup();
+    notify('Draft réinitialisé — les rosters sont intacts');
+  }catch(e){notify('Erreur: '+e.message);}
 };
 
 function showDraftLive(){
