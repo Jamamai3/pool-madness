@@ -1991,11 +1991,21 @@ let draftState=null, draftOrder=[], draftedPlayers={}, draftTimerInterval=null, 
 window.updateTimerLabel=function(){const v=parseInt(document.getElementById('draftTimerRange').value);document.getElementById('draftTimerLabel').textContent=v===0?'Aucun':Math.floor(v/60)+':'+(v%60+'').padStart(2,'0');};
 
 window.openDraftModal=async function(){
-  if(!isAdmin){notify('Seulement le commissaire');return;}
   document.getElementById('draftModal').classList.remove('hidden');
-  // Démarrer le chargement des joueurs en arrière-plan
   loadNHLPlayers();
-  try{const snap=await getDoc(doc(db,'draft','current'));if(snap.exists()&&snap.data().status==='active'){draftState=snap.data();draftOrder=draftState.order||[];draftedPlayers=draftState.drafted||{};showDraftLive();}else{showDraftSetup();}}catch(e){showDraftSetup();}
+  try{
+    const snap=await getDoc(doc(db,'draft','current'));
+    if(snap.exists()&&snap.data().status==='active'){
+      draftState=snap.data();draftOrder=draftState.order||[];draftedPlayers=draftState.drafted||{};
+      showDraftLive();
+    } else {
+      if(!isAdmin){notify('Aucun draft actif en ce moment');document.getElementById('draftModal').classList.add('hidden');return;}
+      showDraftSetup();
+    }
+  }catch(e){
+    if(isAdmin) showDraftSetup();
+    else{notify('Erreur chargement draft');document.getElementById('draftModal').classList.add('hidden');}
+  }
 };
 
 function showDraftSetup(){document.getElementById('draftSetup').classList.remove('hidden');document.getElementById('draftLive').classList.add('hidden');document.getElementById('draftRoundInfo').textContent='Configuration';document.getElementById('draftTurnBadge').textContent='Configuration';document.getElementById('draftTurnBadge').className='draft-turn waiting';renderDraftOrderSetup();}
