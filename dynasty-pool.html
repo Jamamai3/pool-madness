@@ -526,6 +526,13 @@
             </select>
           </div>
           <div id="draftMyTurn" class="hidden" style="background:rgba(200,16,46,0.1);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--accent2);">🏒 C'est ton tour de choisir!</div>
+          <div id="draftLoadSection" style="display:none;margin-bottom:12px;">
+            <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">📡 Chargement des joueurs LNH depuis l'API...</div>
+            <div style="background:var(--bg);border-radius:4px;height:6px;overflow:hidden;margin-bottom:4px;">
+              <div id="draftLoadBar" style="height:100%;background:var(--accent);border-radius:4px;width:0%;transition:width .3s;"></div>
+            </div>
+            <div id="draftLoadText" style="font-size:11px;color:var(--text3);">0/32 équipes</div>
+          </div>
           <div class="draft-player-list" id="draftPlayerList"></div>
         </div>
       </div>
@@ -1511,46 +1518,180 @@ window.submitTrade=async function(){
   }catch(e){notify('Erreur: '+e.message);}
 };
 
-// DRAFT
-const NHL_PLAYERS=[
-  {name:'Connor McDavid',team:'EDM',pos:'C',rating:99},{name:'Nathan MacKinnon',team:'COL',pos:'C',rating:98},
-  {name:'Auston Matthews',team:'TOR',pos:'C',rating:97},{name:'Artemi Panarin',team:'NYR',pos:'LW',rating:94},
-  {name:'Quinn Hughes',team:'VAN',pos:'D',rating:94},{name:'Mikko Rantanen',team:'COL',pos:'RW',rating:95},
-  {name:'David Pastrnak',team:'BOS',pos:'RW',rating:96},{name:'Cole Caufield',team:'MTL',pos:'RW',rating:93},
-  {name:'Cale Makar',team:'COL',pos:'D',rating:99},{name:'Igor Shesterkin',team:'NYR',pos:'G',rating:96},
-  {name:'Connor Hellebuyck',team:'WPG',pos:'G',rating:97},{name:'Andrei Vasilevskiy',team:'TBL',pos:'G',rating:95},
-  {name:'Elias Pettersson',team:'VAN',pos:'C',rating:92},{name:'Rasmus Dahlin',team:'BUF',pos:'D',rating:92},
-  {name:'Adam Fox',team:'NYR',pos:'D',rating:92},{name:'Kirill Kaprizov',team:'MIN',pos:'LW',rating:96},
-  {name:'Jason Robertson',team:'DAL',pos:'LW',rating:93},{name:'William Nylander',team:'TOR',pos:'RW',rating:91},
-  {name:'Roman Josi',team:'NSH',pos:'D',rating:93},{name:'Brayden Point',team:'TBL',pos:'C',rating:91},
-  {name:'Tage Thompson',team:'BUF',pos:'C',rating:90},{name:'Filip Forsberg',team:'NSH',pos:'LW',rating:90},
-  {name:'Victor Hedman',team:'TBL',pos:'D',rating:90},{name:'Jake Oettinger',team:'DAL',pos:'G',rating:89},
-  {name:'Sebastian Aho',team:'CAR',pos:'C',rating:89},{name:'Linus Ullmark',team:'OTT',pos:'G',rating:91},
-  {name:'Jeremy Swayman',team:'BOS',pos:'G',rating:88},{name:'Evan Bouchard',team:'EDM',pos:'D',rating:88},
-  {name:'Erik Karlsson',team:'PIT',pos:'D',rating:91},{name:'Nick Suzuki',team:'MTL',pos:'C',rating:85},
-  {name:'Jake Guentzel',team:'TBL',pos:'LW',rating:88},{name:'Chris Kreider',team:'NYR',pos:'LW',rating:85},
-  {name:'Brandon Hagel',team:'TBL',pos:'LW',rating:85},{name:'Miro Heiskanen',team:'DAL',pos:'D',rating:91},
-  {name:'Filip Gustavsson',team:'MIN',pos:'G',rating:87},{name:'Alex DeBrincat',team:'DET',pos:'RW',rating:87},
-  {name:'Moritz Seider',team:'DET',pos:'D',rating:87},{name:'Timo Meier',team:'NJD',pos:'RW',rating:86},
-  {name:'Ryan Nugent-Hopkins',team:'EDM',pos:'C',rating:86},{name:'Devon Toews',team:'COL',pos:'D',rating:87},
-  {name:'Noah Dobson',team:'NYI',pos:'D',rating:86},{name:'Zach Hyman',team:'EDM',pos:'LW',rating:84},
-  {name:'Juuse Saros',team:'NSH',pos:'G',rating:88},{name:'Stuart Skinner',team:'EDM',pos:'G',rating:84},
-  {name:'Dylan Larkin',team:'DET',pos:'C',rating:84},{name:'Nazem Kadri',team:'CGY',pos:'C',rating:84},
-  {name:'Patrick Kane',team:'DET',pos:'RW',rating:88},{name:'Drew Doughty',team:'LAK',pos:'D',rating:85},
-  {name:'Alex Pietrangelo',team:'VGK',pos:'D',rating:84},{name:'Darnell Nurse',team:'EDM',pos:'D',rating:82},
-  {name:'Nikolaj Ehlers',team:'WPG',pos:'LW',rating:88},{name:'Tomas Hertl',team:'VGK',pos:'C',rating:83},
-  {name:'Juraj Slafkovsky',team:'MTL',pos:'LW',rating:82},{name:'Wyatt Johnston',team:'DAL',pos:'C',rating:81},
-  {name:'Dylan Cozens',team:'BUF',pos:'C',rating:80},{name:'Shane Wright',team:'SEA',pos:'C',rating:78},
-  {name:'Marco Rossi',team:'MIN',pos:'C',rating:78},{name:'Anthony Mantha',team:'WSH',pos:'LW',rating:79},
-  {name:'Nino Niederreiter',team:'WPG',pos:'LW',rating:78},{name:'Jonathan Drouin',team:'COL',pos:'LW',rating:77},
-  {name:'Anze Kopitar',team:'LAK',pos:'C',rating:87},{name:'Elias Lindholm',team:'BOS',pos:'C',rating:83},
-  {name:'Pierre-Luc Dubois',team:'WSH',pos:'C',rating:82},{name:'Brock Nelson',team:'NYI',pos:'RW',rating:82},
-  {name:'Claude Giroux',team:'OTT',pos:'RW',rating:83},{name:'Rickard Rakell',team:'PIT',pos:'RW',rating:82},
-  {name:'Samuel Girard',team:'COL',pos:'D',rating:82},{name:'Jakob Chychrun',team:'WSH',pos:'D',rating:83},
-  {name:'Connor Clifton',team:'BUF',pos:'D',rating:76},{name:'Samuel Montembeault',team:'MTL',pos:'G',rating:82},
-  {name:'Tristan Jarry',team:'PIT',pos:'G',rating:83},{name:'Cam Talbot',team:'OTT',pos:'G',rating:82},
-  {name:'Mackenzie Blackwood',team:'SJS',pos:'G',rating:80},{name:'Mark Scheifele',team:'WPG',pos:'RW',rating:88},
+// DRAFT — Joueurs LNH dynamiques
+let NHL_PLAYERS = []; // Sera chargé depuis l'API
+let nhlPlayersLoaded = false;
+let nhlPlayersLoading = false;
+
+const NHL_TEAMS_LIST = ['ANA','BOS','BUF','CGY','CAR','CHI','COL','CBJ','DAL','DET','EDM','FLA','LAK','MIN','MTL','NSH','NJD','NYI','NYR','OTT','PHI','PIT','SEA','SJS','STL','TBL','TOR','UTA','VAN','VGK','WSH','WPG'];
+const SEASON = '20242025';
+
+// Fallback minimal si API fail
+const NHL_PLAYERS_FALLBACK = [
+  {name:'Connor McDavid',team:'EDM',pos:'C',seasonPts:100,gamesPlayed:69},
+  {name:'Nathan MacKinnon',team:'COL',pos:'C',seasonPts:96,gamesPlayed:68},
+  {name:'Auston Matthews',team:'TOR',pos:'C',seasonPts:86,gamesPlayed:68},
+  {name:'Cale Makar',team:'COL',pos:'D',seasonPts:84,gamesPlayed:66},
+  {name:'Cole Caufield',team:'MTL',pos:'RW',seasonPts:82,gamesPlayed:70},
+  {name:'David Pastrnak',team:'BOS',pos:'RW',seasonPts:81,gamesPlayed:70},
+  {name:'Mikko Rantanen',team:'COL',pos:'RW',seasonPts:96,gamesPlayed:66},
+  {name:'Quinn Hughes',team:'VAN',pos:'D',seasonPts:78,gamesPlayed:68},
+  {name:'Connor Hellebuyck',team:'WPG',pos:'G',seasonPts:0,gamesPlayed:60},
+  {name:'Igor Shesterkin',team:'NYR',pos:'G',seasonPts:0,gamesPlayed:55},
 ];
+
+async function fetchWithProxy(url) {
+  const proxies = [
+    u => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(u),
+    u => 'https://corsproxy.io/?' + encodeURIComponent(u),
+  ];
+  for (const makeProxy of proxies) {
+    try {
+      const r = await fetch(makeProxy(url), {signal: AbortSignal.timeout(8000)});
+      if (!r.ok) continue;
+      const text = await r.text();
+      return JSON.parse(text);
+    } catch(e) { continue; }
+  }
+  return null;
+}
+
+async function loadNHLPlayers() {
+  if (nhlPlayersLoaded || nhlPlayersLoading) return;
+  nhlPlayersLoading = true;
+
+  // Vérifier le cache Firebase (valide 24h)
+  try {
+    const cacheSnap = await getDoc(doc(db, 'config', 'nhlRoster'));
+    if (cacheSnap.exists()) {
+      const data = cacheSnap.data();
+      const age = Date.now() - (data.cachedAt?.seconds || 0) * 1000;
+      if (age < 24 * 3600 * 1000 && data.players?.length > 100) {
+        NHL_PLAYERS = data.players;
+        nhlPlayersLoaded = true;
+        nhlPlayersLoading = false;
+        updateDraftLoadingUI(NHL_PLAYERS.length, NHL_TEAMS_LIST.length, true);
+        return;
+      }
+    }
+  } catch(e) {}
+
+  updateDraftLoadingUI(0, NHL_TEAMS_LIST.length, false);
+
+  const players = [];
+  let teamsLoaded = 0;
+
+  // Charger les rosters des 32 équipes
+  for (const team of NHL_TEAMS_LIST) {
+    try {
+      const data = await fetchWithProxy(`https://api-web.nhle.com/v1/roster/${team}/${SEASON}`);
+      if (data) {
+        const processGroup = (group, pos) => {
+          (data[group] || []).forEach(p => {
+            const firstName = p.firstName?.default || '';
+            const lastName = p.lastName?.default || '';
+            const name = (firstName + ' ' + lastName).trim();
+            if (!name) return;
+            players.push({
+              name,
+              team,
+              pos,
+              playerId: p.id,
+              number: p.sweaterNumber || 0,
+              seasonPts: 0,
+              gamesPlayed: 0,
+            });
+          });
+        };
+        processGroup('forwards', null); // On assignera C/LW/RW depuis positionCode
+        processGroup('defensemen', 'D');
+        processGroup('goalies', 'G');
+
+        // Retraitement — forwards avec positionCode
+        (data.forwards || []).forEach(p => {
+          const firstName = p.firstName?.default || '';
+          const lastName = p.lastName?.default || '';
+          const name = (firstName + ' ' + lastName).trim();
+          if (!name) return;
+          const idx = players.findIndex(pl => pl.name === name && pl.team === team);
+          if (idx !== -1) {
+            const code = p.positionCode || 'C';
+            players[idx].pos = ['L','LW'].includes(code) ? 'LW' : ['R','RW'].includes(code) ? 'RW' : 'C';
+          }
+        });
+      }
+    } catch(e) {}
+    teamsLoaded++;
+    updateDraftLoadingUI(players.length, teamsLoaded, false);
+  }
+
+  if (players.length < 50) {
+    // Fallback si l'API a échoué
+    NHL_PLAYERS = NHL_PLAYERS_FALLBACK;
+    nhlPlayersLoaded = true;
+    nhlPlayersLoading = false;
+    updateDraftLoadingUI(NHL_PLAYERS.length, NHL_TEAMS_LIST.length, true);
+    notify('API LNH indisponible — liste de base utilisée');
+    return;
+  }
+
+  // Charger les stats de points (skaters leaders)
+  try {
+    const statsData = await fetchWithProxy(`https://api-web.nhle.com/v1/skater-stats-leaders/${SEASON}/2?categories=points&limit=200`);
+    if (statsData?.points) {
+      statsData.points.forEach(s => {
+        const firstName = s.firstName?.default || '';
+        const lastName = s.lastName?.default || '';
+        const name = (firstName + ' ' + lastName).trim();
+        const idx = players.findIndex(p => p.name === name);
+        if (idx !== -1) {
+          players[idx].seasonPts = s.value || 0;
+          players[idx].gamesPlayed = s.gamesPlayed || 0;
+        }
+      });
+    }
+  } catch(e) {}
+
+  // Dédupliquer (un joueur peut avoir changé d'équipe)
+  const seen = new Set();
+  const unique = players.filter(p => {
+    if (seen.has(p.name)) return false;
+    seen.add(p.name);
+    return true;
+  });
+
+  NHL_PLAYERS = unique.sort((a, b) => b.seasonPts - a.seasonPts);
+  nhlPlayersLoaded = true;
+  nhlPlayersLoading = false;
+
+  // Sauvegarder en cache Firebase
+  try {
+    await setDoc(doc(db, 'config', 'nhlRoster'), {
+      players: NHL_PLAYERS,
+      cachedAt: serverTimestamp(),
+      count: NHL_PLAYERS.length
+    });
+  } catch(e) {}
+
+  updateDraftLoadingUI(NHL_PLAYERS.length, NHL_TEAMS_LIST.length, true);
+  notify('✅ ' + NHL_PLAYERS.length + ' joueurs LNH chargés depuis l\'API!');
+}
+
+function updateDraftLoadingUI(playerCount, teamsLoaded, done) {
+  const loadBar = document.getElementById('draftLoadBar');
+  const loadText = document.getElementById('draftLoadText');
+  const loadSection = document.getElementById('draftLoadSection');
+  if (!loadSection) return;
+  if (done) {
+    loadSection.style.display = 'none';
+    if (document.getElementById('draftPlayerList')) renderDraftPlayers();
+    return;
+  }
+  loadSection.style.display = 'block';
+  const pct = Math.round((teamsLoaded / NHL_TEAMS_LIST.length) * 100);
+  if (loadBar) loadBar.style.width = pct + '%';
+  if (loadText) loadText.textContent = teamsLoaded + '/' + NHL_TEAMS_LIST.length + ' équipes • ' + playerCount + ' joueurs';
+}
 
 let draftState=null, draftOrder=[], draftedPlayers={}, draftTimerInterval=null, draftTimeLeft=0;
 
@@ -1559,6 +1700,8 @@ window.updateTimerLabel=function(){const v=parseInt(document.getElementById('dra
 window.openDraftModal=async function(){
   if(!isAdmin){notify('Seulement le commissaire');return;}
   document.getElementById('draftModal').classList.remove('hidden');
+  // Démarrer le chargement des joueurs en arrière-plan
+  loadNHLPlayers();
   try{const snap=await getDoc(doc(db,'draft','current'));if(snap.exists()&&snap.data().status==='active'){draftState=snap.data();draftOrder=draftState.order||[];draftedPlayers=draftState.drafted||{};showDraftLive();}else{showDraftSetup();}}catch(e){showDraftSetup();}
 };
 
@@ -1621,19 +1764,37 @@ function getMyDraftCounts(){
   myPicks.forEach(p=>{const player=NHL_PLAYERS.find(pl=>pl.name===p.selected);if(!player)return;if(player.pos==='G')g++;else if(player.pos==='D')d++;else f++;});
   return {forwards:f,defense:d,goalies:g};
 }
-function isPositionMaxed(pos){const counts=getMyDraftCounts();if(pos==='G')return counts.goalies>=POS_LIMITS.goalies;if(pos==='D')return counts.defense>=POS_LIMITS.defense;return counts.forwards>=POS_LIMITS.forwards;}
+function isPositionMaxed(pos){const counts=getMyDraftCounts();if(pos='G')return counts.goalies>=POS_LIMITS.goalies;if(pos='D')return counts.defense>=POS_LIMITS.defense;return counts.forwards>=POS_LIMITS.forwards;}
 
 function renderDraftPlayers(){
   const search=(document.getElementById('draftSearch')?.value||'').toLowerCase();
   const pos=document.getElementById('draftPosFilter')?.value||'';
-  const isMyTurn=currentUser&&draftState.picks[draftState.currentPick]?.uid===currentUser.uid;
-  const filtered=NHL_PLAYERS.filter(p=>{const drafted=draftedPlayers[p.name];const matchSearch=p.name.toLowerCase().includes(search)||p.team.toLowerCase().includes(search);const matchPos=!pos||p.pos===pos;return matchSearch&&matchPos;}).sort((a,b)=>b.rating-a.rating);
+  const isMyTurn=currentUser&&draftState&&draftState.picks[draftState.currentPick]?.uid===currentUser.uid;
+  if(!nhlPlayersLoaded){
+    const ls=document.getElementById('draftLoadSection');if(ls)ls.style.display='block';
+    document.getElementById('draftPlayerList').innerHTML='<div class="empty" style="padding:30px;"><div style="font-size:13px;color:var(--text2);">⏳ Chargement des joueurs LNH en cours...</div></div>';
+    return;
+  }
+  const filtered=NHL_PLAYERS.filter(p=>{
+    const drafted=draftedPlayers[p.name];
+    const matchSearch=p.name.toLowerCase().includes(search)||(p.team||'').toLowerCase().includes(search);
+    const matchPos=!pos||p.pos===pos;
+    return matchSearch&&matchPos;
+  }).sort((a,b)=>(b.seasonPts||0)-(a.seasonPts||0));
   const counts=getMyDraftCounts();
-  const posBar='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.forwards>=POS_LIMITS.forwards?'rgba(239,68,68,0.2)':'rgba(245,158,11,0.1)')+';color:'+(counts.forwards>=POS_LIMITS.forwards?'var(--red)':'var(--text2)')+';">ATT: '+counts.forwards+'/'+POS_LIMITS.forwards+'</span><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.defense>=POS_LIMITS.defense?'rgba(239,68,68,0.2)':'rgba(139,92,246,0.1)')+';color:'+(counts.defense>=POS_LIMITS.defense?'var(--red)':'var(--text2)')+';">DEF: '+counts.defense+'/'+POS_LIMITS.defense+'</span><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.goalies>=POS_LIMITS.goalies?'rgba(239,68,68,0.2)':'rgba(200,16,46,0.1)')+';color:'+(counts.goalies>=POS_LIMITS.goalies?'var(--red)':'var(--text2)')+';">GOAL: '+counts.goalies+'/'+POS_LIMITS.goalies+'</span></div>';
-  const listHtml=filtered.map(p=>{const drafted=draftedPlayers[p.name];const maxed=isMyTurn&&!drafted&&isPositionMaxed(p.pos);const blocked=drafted||maxed;return '<div class="draft-player-item '+(drafted?'drafted':maxed?'drafted':'')+'" onclick="'+(blocked||!isMyTurn?'':'pickPlayer(\''+p.name+'\')')+'"><span class="pos pos-'+p.pos+'" style="font-size:9px;padding:1px 5px;">'+p.pos+'</span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;">'+p.name+' <span style="font-size:10px;color:var(--text3);">'+p.team+'</span></div>'+(drafted?'<div style="font-size:10px;color:var(--text3);">→ '+drafted+'</div>':'')+(maxed?'<div style="font-size:10px;color:var(--red);">Maximum atteint pour cette position</div>':'')+'</div>'+((!blocked&&isMyTurn)?'<button class="btn btn-p" style="font-size:10px;padding:4px 10px;">Choisir</button>':'')+(!drafted&&!maxed&&!isMyTurn?'<span style="font-size:10px;color:var(--text3);">⭐'+p.rating+'</span>':'')+( drafted?'<span style="font-size:10px;color:var(--text3);">Repêché</span>':'')+(maxed&&!drafted?'<span style="font-size:10px;color:var(--red);">Max atteint</span>':'')+'</div>';}).join('');
+  const posBar='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.forwards>=POS_LIMITS.forwards?'rgba(239,68,68,0.2)':'rgba(245,158,11,0.1)')+';color:'+(counts.forwards>=POS_LIMITS.forwards?'var(--red)':'var(--text2)')+';">ATT: '+counts.forwards+'/'+POS_LIMITS.forwards+'</span><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.defense>=POS_LIMITS.defense?'rgba(239,68,68,0.2)':'rgba(139,92,246,0.1)')+';color:'+(counts.defense>=POS_LIMITS.defense?'var(--red)':'var(--text2)')+';">DEF: '+counts.defense+'/'+POS_LIMITS.defense+'</span><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.goalies>=POS_LIMITS.goalies?'rgba(239,68,68,0.2)':'rgba(200,16,46,0.1)')+';color:'+(counts.goalies>=POS_LIMITS.goalies?'var(--red)':'var(--text2)')+';">GOAL: '+counts.goalies+'/'+POS_LIMITS.goalies+'</span><span style="font-size:11px;color:var(--text3);padding:3px 0;">'+NHL_PLAYERS.length+' joueurs • '+filtered.length+' affichés</span></div>';
+  const listHtml=filtered.slice(0,150).map(p=>{
+    const drafted=draftedPlayers[p.name];
+    const maxed=isMyTurn&&!drafted&&isPositionMaxed(p.pos);
+    const blocked=drafted||maxed;
+    const pts=p.seasonPts||0;
+    const gp=p.gamesPlayed||0;
+    const safeName=p.name.replace(/'/g,"\\'");
+    return '<div class="draft-player-item '+(drafted?'drafted':maxed?'drafted':'')+'" onclick="'+(blocked||!isMyTurn?'':('pickPlayer(\''+safeName+'\')'))+'"><span class="pos pos-'+p.pos+'" style="font-size:9px;padding:1px 5px;">'+p.pos+'</span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13px;">'+p.name+' <span style="font-size:10px;color:var(--text3);">#'+(p.number||'—')+' '+p.team+'</span></div>'+(drafted?'<div style="font-size:10px;color:var(--text3);">→ '+drafted+'</div>':'')+( maxed?'<div style="font-size:10px;color:var(--red);">Maximum atteint</div>':'')+'</div>'+((!blocked&&isMyTurn)?'<button class="btn btn-p" style="font-size:10px;padding:4px 10px;">Choisir</button>':'')+( drafted?'<span style="font-size:10px;color:var(--text3);">Repêché</span>':'')+(!drafted&&!maxed&&!isMyTurn?'<span style="font-size:11px;color:var(--text2);text-align:right;min-width:55px;">'+pts+'pts<br><span style="color:var(--text3);font-size:10px;">'+gp+'PJ</span></span>':'')+( maxed&&!drafted?'<span style="font-size:10px;color:var(--red);">Max</span>':'')+'</div>';
+  }).join('')+(filtered.length>150?'<div style="text-align:center;padding:12px;color:var(--text3);font-size:12px;">'+(filtered.length-150)+' autres — affinez votre recherche</div>':''
+  );
   document.getElementById('draftPlayerList').innerHTML=(isMyTurn?posBar:'')+listHtml;
 }
-
 window.filterDraftPlayers=function(){renderDraftPlayers();};
 
 window.pickPlayer=async function(playerName){
