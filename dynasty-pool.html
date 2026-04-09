@@ -298,6 +298,7 @@
       <button class="nav-btn" onclick="showView('wv')">Waiver</button>
       <button class="nav-btn" onclick="showView('ch');markChatRead()" id="btnChat">Chat <span id="chatBadge" style="display:none;background:var(--blue);color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:3px;">●</span></button>
       <button class="nav-btn" id="adminBtn" style="color:var(--gold);display:none" onclick="showView('ad')">⚙ Admin</button>
+      <button class="nav-btn" id="draftNavBtn" style="display:none;" onclick="openDraftModal()">🏒 Draft <span id="draftNavBadge" style="display:none;background:var(--accent);color:white;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:3px;animation:pulse 1s infinite;">TON TOUR</span></button>
     </div>
     <div style="display:flex;align-items:center;gap:6px;">
       <div class="user-pill" id="userPill">
@@ -1326,6 +1327,69 @@ function showApp(){
   startTradesListener();
   loadChat();
   startChatPolling();
+  checkDraftStatus();
+  startDraftPolling();
+}
+
+let draftPollingInterval = null;
+let lastDraftPick = -1;
+
+async function checkDraftStatus(){
+  try{
+    const snap = await getDoc(doc(db,'draft','current'));
+    const draftNavBtn = document.getElementById('draftNavBtn');
+    const draftNavBadge = document.getElementById('draftNavBadge');
+    if(!draftNavBtn) return;
+
+    if(!snap.exists() || snap.data().status !== 'active'){
+      draftNavBtn.style.display = 'none';
+      return;
+    }
+
+    const data = snap.data();
+    const picks = data.picks || [];
+    const currentPick = data.currentPick || 0;
+    const curr = picks[currentPick];
+
+    // Draft actif — afficher le bouton pour tout le monde
+    draftNavBtn.style.display = 'block';
+
+    if(!curr){
+      draftNavBtn.innerHTML = '🏒 Draft terminé';
+      draftNavBadge.style.display = 'none';
+      return;
+    }
+
+    const isMyTurn = currentUser && curr.uid === currentUser.uid;
+
+    if(isMyTurn){
+      draftNavBtn.style.cssText = 'display:block;background:var(--accent);color:white;border-color:var(--accent);font-weight:700;border:1px solid var(--accent);padding:4px 9px;border-radius:7px;font-size:12px;cursor:pointer;';
+      draftNavBadge.style.display = 'inline';
+      if(lastDraftPick !== currentPick){
+        notify("🏒 C'est ton tour de drafter!");
+        lastDraftPick = currentPick;
+      }
+    } else {
+      draftNavBtn.style.cssText = 'display:block;';
+      draftNavBadge.style.display = 'none';
+      const turnName = curr.name ? curr.name.split(' ')[0] : '—';
+      draftNavBtn.innerHTML = '🏒 Draft <span style="font-size:10px;color:var(--text2);margin-left:3px;">'+curr.name+'</span>';
+    }
+
+    // Sync état draft si modal ouvert
+    if(draftState && draftState.currentPick !== currentPick){
+      draftState = data;
+      draftedPlayers = data.drafted || {};
+      if(!document.getElementById('draftModal').classList.contains('hidden')){
+        renderDraftPickList(); renderDraftPlayers(); updateDraftTurnUI();
+      }
+    }
+  }catch(e){}
+}
+
+function startDraftPolling(){
+  if(draftPollingInterval) clearInterval(draftPollingInterval);
+  draftPollingInterval = setInterval(checkDraftStatus, 15000);
 }
 
 window.signInEmail = async function(){
@@ -1456,6 +1520,12 @@ function startTradesListener(){
   }, 30000);
 }
 
+// State pour le trade en attente de libération
+let pendingTradeData = null;
+let pendingTradeWaiverFor = null; // 'from' ou 'to'
+let pendingTradeWaiverNeeded = 0;
+let pendingTradeWaiverSelected = [];
+
 window.accTrade=async function(fid){
   try{
     const tradeSnap = await getDoc(doc(db,'trades',fid));
@@ -1468,35 +1538,191 @@ window.accTrade=async function(fid){
     const toData = toSnap.exists()?toSnap.data():{actif:[],reserve:[]};
     let fromActif=[...fromData.actif||[]]; let fromReserve=[...fromData.reserve||[]];
     let toActif=[...toData.actif||[]]; let toReserve=[...toData.reserve||[]];
-    // Transférer les joueurs que FROM envoie → TO
-    for(const playerName of (trade.give||[])){
-      const inActif = fromActif.findIndex(p=>p.name===playerName);
-      const inReserve = fromReserve.findIndex(p=>p.name===playerName);
-      if(inActif!==-1){ const p=fromActif.splice(inActif,1)[0]; toReserve.push({...p,status:'reserve'}); }
-      else if(inReserve!==-1){ const p=fromReserve.splice(inReserve,1)[0]; toReserve.push({...p,status:'reserve'}); }
+
+    // Calculer le delta net de joueurs pour chaque DG
+    const giveCount = (trade.give||[]).filter(n=>!n.includes('ronde')).length; // exclure picks
+    const receiveCount = (trade.receive||[]).filter(n=>!n.includes('ronde')).length;
+    const fromNetGain = receiveCount - giveCount; // FROM reçoit plus qu'il envoie?
+    const toNetGain = giveCount - receiveCount;
+
+    // Vérifier si TO (qui accepte) a de la place
+    const toTotal = toActif.length + toReserve.length;
+    const toMax = 30; // 20 actifs + 10 réserve
+    const toOverflow = Math.max(0, (toTotal + toNetGain) - toMax);
+
+    // Vérifier si FROM a de la place pour ce qu'il reçoit
+    const fromTotal = fromActif.length + fromReserve.length;
+    const fromOverflow = Math.max(0, (fromTotal + fromNetGain) - toMax);
+
+    // Si TO doit libérer des joueurs
+    if(toOverflow > 0 && currentUser && trade.toUid === currentUser.uid){
+      // Stocker le trade en attente et ouvrir le modal de libération
+      pendingTradeData = {fid, trade, fromData, toData};
+      pendingTradeWaiverFor = 'to';
+      pendingTradeWaiverNeeded = toOverflow;
+      pendingTradeWaiverSelected = [];
+      const myRoster = [...toActif, ...toReserve];
+      showTradeWaiverModal(myRoster, toOverflow, trade);
+      return;
     }
-    // Transférer les joueurs que TO envoie → FROM
-    for(const playerName of (trade.receive||[])){
-      const inActif = toActif.findIndex(p=>p.name===playerName);
-      const inReserve = toReserve.findIndex(p=>p.name===playerName);
-      if(inActif!==-1){ const p=toActif.splice(inActif,1)[0]; fromReserve.push({...p,status:'reserve'}); }
-      else if(inReserve!==-1){ const p=toReserve.splice(inReserve,1)[0]; fromReserve.push({...p,status:'reserve'}); }
+
+    // Si FROM doit libérer (admin force ou cas spécial)
+    if(fromOverflow > 0 && isAdmin){
+      notify('⚠️ '+( dgs.find(d=>d.id===trade.fromUid)?.name||'FROM')+' devra libérer '+fromOverflow+' joueur(s) — contact-le.');
     }
-    // Sauvegarder les deux rosters
-    await setDoc(doc(db,'rosters',trade.fromUid),{actif:fromActif,reserve:fromReserve,ts:serverTimestamp()});
-    await setDoc(doc(db,'rosters',trade.toUid),{actif:toActif,reserve:toReserve,ts:serverTimestamp()});
-    await setDoc(doc(db,'trades',fid),{status:'accepted'},{merge:true});
-    // Recharger mon roster si impliqué
-    if(currentUser&&(trade.fromUid===currentUser.uid||trade.toUid===currentUser.uid)){
-      await loadRoster(currentUser.uid); renderRoster(); updateStats();
-    }
-    await postSystemChat('✅ Trade complété: '+trade.from+' ⇄ '+trade.to+' ('+((trade.give||[]).concat(trade.receive||[])).join(', ')+')');
-    await logTx('Trade accepté: '+trade.from+' ⇄ '+trade.to);
-    await loadTrades(); renderTrades();
-    notify('Trade accepté — joueurs transférés!');
+
+    // Procéder au transfert
+    await executeTradeTransfer(fid, trade, fromData, toData, [], []);
   }
   catch(e){notify('Erreur: '+e.message); console.error(e);}
 };
+
+function showTradeWaiverModal(roster, needed, trade){
+  // Créer un modal temporaire
+  let modal = document.getElementById('tradeWaiverModal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'tradeWaiverModal';
+    modal.className = 'modal-bg';
+    document.body.appendChild(modal);
+  }
+    const s = needed>1?'s':'';
+  const rosterHtml = roster.map((p,i)=>{
+    const safeName = p.name.replace(/'/g,"\'");
+    return '<div class="keeper-item" id="waiverItem_'+i+'" onclick="toggleWaiverPick('+i+',\''+safeName+'\')">'+
+      '<div class="keeper-chk" id="waiverChk_'+i+'"></div>'+
+      '<span class="pos pos-'+p.pos+'" style="font-size:9px;padding:1px 5px;">'+p.pos+'</span>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="font-weight:600;font-size:13px;">'+p.name+'</div>'+
+        '<div style="font-size:10px;color:var(--text2);">'+p.team+' • '+(p.status==='active'?'Actif':'Réserve')+' • '+(p.seasonPts||0)+' pts</div>'+
+      '</div></div>';
+  }).join('');
+  modal.innerHTML =
+    '<div class="modal" style="max-width:480px;">'+
+      '<div class="modal-hdr">'+
+        '<h2>⚠️ Libère '+needed+' joueur'+s+' pour compléter le trade</h2>'+
+        '<button class="modal-close" onclick="document.getElementById(\'tradeWaiverModal\').classList.add(\'hidden\')">✕</button>'+
+      '</div>'+
+      '<div class="modal-body">'+
+        '<div style="font-size:13px;color:var(--text2);margin-bottom:14px;">'+
+          'Tu reçois plus de joueurs que tu envoies. Choisis '+needed+' joueur'+s+' à envoyer au waiver wire.'+
+        '</div>'+
+        '<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;">Ton roster actuel</div>'+
+        '<div id="waiverPickList" style="display:flex;flex-direction:column;gap:5px;max-height:300px;overflow-y:auto;">'+rosterHtml+'</div>'+
+        '<div style="margin-top:14px;display:flex;gap:8px;align-items:center;">'+
+          '<span id="waiverPickCount" style="font-size:12px;color:var(--text2);">0/'+needed+' sélectionné'+s+'</span>'+
+          '<button class="btn btn-p" style="flex:1;" onclick="confirmTradeWithWaiver()">✅ Confirmer et compléter le trade</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>'
+  modal.classList.remove('hidden');
+}
+
+window.toggleWaiverPick = function(idx, playerName){
+  const item = document.getElementById('waiverItem_'+idx);
+  const chk = document.getElementById('waiverChk_'+idx);
+  const alreadyIdx = pendingTradeWaiverSelected.indexOf(playerName);
+  if(alreadyIdx !== -1){
+    pendingTradeWaiverSelected.splice(alreadyIdx,1);
+    item.classList.remove('selected');
+    chk.textContent = '';
+  } else {
+    if(pendingTradeWaiverSelected.length >= pendingTradeWaiverNeeded){
+      notify('Tu as déjà sélectionné '+pendingTradeWaiverNeeded+' joueur(s)');
+      return;
+    }
+    pendingTradeWaiverSelected.push(playerName);
+    item.classList.add('selected');
+    chk.textContent = '✓';
+  }
+  document.getElementById('waiverPickCount').textContent =
+    pendingTradeWaiverSelected.length+'/'+pendingTradeWaiverNeeded+' sélectionné'+(pendingTradeWaiverNeeded>1?'s':'');
+};
+
+window.confirmTradeWithWaiver = async function(){
+  if(pendingTradeWaiverSelected.length < pendingTradeWaiverNeeded){
+    notify('Sélectionne encore '+(pendingTradeWaiverNeeded-pendingTradeWaiverSelected.length)+' joueur(s)');
+    return;
+  }
+  document.getElementById('tradeWaiverModal').classList.add('hidden');
+  const {fid, trade, fromData, toData} = pendingTradeData;
+  await executeTradeTransfer(fid, trade, fromData, toData, [], pendingTradeWaiverSelected);
+  pendingTradeData = null; pendingTradeWaiverSelected = [];
+};
+
+async function executeTradeTransfer(fid, trade, fromData, toData, fromWaiverNames, toWaiverNames){
+  let fromActif=[...fromData.actif||[]]; let fromReserve=[...fromData.reserve||[]];
+  let toActif=[...toData.actif||[]]; let toReserve=[...toData.reserve||[]];
+
+  // Retirer les joueurs envoyés au waiver avant le trade
+  const waiverPlayers = [];
+  for(const name of toWaiverNames){
+    const iA=toActif.findIndex(p=>p.name===name);
+    const iR=toReserve.findIndex(p=>p.name===name);
+    if(iA!==-1){ waiverPlayers.push(toActif.splice(iA,1)[0]); }
+    else if(iR!==-1){ waiverPlayers.push(toReserve.splice(iR,1)[0]); }
+  }
+  for(const name of fromWaiverNames){
+    const iA=fromActif.findIndex(p=>p.name===name);
+    const iR=fromReserve.findIndex(p=>p.name===name);
+    if(iA!==-1){ waiverPlayers.push(fromActif.splice(iA,1)[0]); }
+    else if(iR!==-1){ waiverPlayers.push(fromReserve.splice(iR,1)[0]); }
+  }
+
+  // Transférer les joueurs que FROM envoie → TO
+  for(const playerName of (trade.give||[]).filter(n=>!n.includes('ronde'))){
+    const iA=fromActif.findIndex(p=>p.name===playerName);
+    const iR=fromReserve.findIndex(p=>p.name===playerName);
+    if(iA!==-1){
+      const p=fromActif.splice(iA,1)[0];
+      if(toReserve.length<10) toReserve.push({...p,status:'reserve'});
+      else if(toActif.length<20) toActif.push({...p,status:'active'});
+    } else if(iR!==-1){
+      const p=fromReserve.splice(iR,1)[0];
+      if(toReserve.length<10) toReserve.push({...p,status:'reserve'});
+      else if(toActif.length<20) toActif.push({...p,status:'active'});
+    }
+  }
+  // Transférer les joueurs que TO envoie → FROM
+  for(const playerName of (trade.receive||[]).filter(n=>!n.includes('ronde'))){
+    const iA=toActif.findIndex(p=>p.name===playerName);
+    const iR=toReserve.findIndex(p=>p.name===playerName);
+    if(iA!==-1){
+      const p=toActif.splice(iA,1)[0];
+      if(fromReserve.length<10) fromReserve.push({...p,status:'reserve'});
+      else if(fromActif.length<20) fromActif.push({...p,status:'active'});
+    } else if(iR!==-1){
+      const p=toReserve.splice(iR,1)[0];
+      if(fromReserve.length<10) fromReserve.push({...p,status:'reserve'});
+      else if(fromActif.length<20) fromActif.push({...p,status:'active'});
+    }
+  }
+
+  // Ajouter les joueurs coupés au waiver wire
+  if(waiverPlayers.length){
+    const wSnap=await getDoc(doc(db,'config','waiver'));
+    const cw=wSnap.exists()?(wSnap.data().players||[]):[];
+    const newWV=[...waiverPlayers.map(p=>({name:p.name,team:p.team,pos:p.pos,num:p.num||0,seasonPts:p.seasonPts||0})),...cw];
+    await setDoc(doc(db,'config','waiver'),{players:newWV});
+    wv=newWV;
+  }
+
+  // Sauvegarder les deux rosters
+  await setDoc(doc(db,'rosters',trade.fromUid),{actif:fromActif,reserve:fromReserve,ts:serverTimestamp()});
+  await setDoc(doc(db,'rosters',trade.toUid),{actif:toActif,reserve:toReserve,ts:serverTimestamp()});
+  await setDoc(doc(db,'trades',fid),{status:'accepted'},{merge:true});
+
+  // Recharger mon roster si impliqué
+  if(currentUser&&(trade.fromUid===currentUser.uid||trade.toUid===currentUser.uid)){
+    await loadRoster(currentUser.uid); renderRoster(); updateStats();
+  }
+
+  const waiverMsg = waiverPlayers.length ? ' ('+waiverPlayers.map(p=>p.name).join(', ')+' → waiver)' : '';
+  await postSystemChat('✅ Trade complété: '+trade.from+' ⇄ '+trade.to+' ('+((trade.give||[]).concat(trade.receive||[])).join(', ')+')'+waiverMsg);
+  await logTx('Trade accepté: '+trade.from+' ⇄ '+trade.to+waiverMsg);
+  await loadTrades(); renderTrades();
+  notify('Trade complété — joueurs transférés!'+( waiverPlayers.length?' '+waiverPlayers.length+' joueur(s) → waiver':''));
+}
 window.refTrade=async function(fid){
   try{await setDoc(doc(db,'trades',fid),{status:'refused'},{merge:true});await loadTrades();renderTrades();notify('Trade refusé.');}
   catch(e){notify('Erreur: '+e.message);}
