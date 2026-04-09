@@ -442,6 +442,7 @@
             <button class="ab" style="width:100%;text-align:left;" onclick="loadWV()">↻ Actualiser waiver wire</button>
             <button class="ab" style="width:100%;text-align:left;" onclick="initWaiverPriority()">🔀 Initialiser priorité waiver</button>
             <button class="ab" style="width:100%;text-align:left;" onclick="processExpiredClaims()">⚡ Traiter réclamations expirées</button>
+            <button class="ab" style="width:100%;text-align:left;color:var(--red);border-color:rgba(239,68,46,.2);" onclick="resetDraft()">↺ Reset le draft</button>
             <button class="ab" style="width:100%;text-align:left;" onclick="testNHL()">⚡ Tester API LNH</button>
             <button class="ab" style="width:100%;text-align:left;color:var(--red);border-color:rgba(239,68,46,.2);" onclick="cancelTrade()">✕ Annuler dernier trade</button>
           </div></div>
@@ -533,6 +534,15 @@
             <select id="draftPosFilter" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:12px;" onchange="filterDraftPlayers()">
               <option value="">Toutes positions</option><option value="C">Centre</option><option value="LW">Ailier G</option><option value="RW">Ailier D</option><option value="D">Défenseur</option><option value="G">Gardien</option>
             </select>
+            <select id="draftSortBy" style="padding:6px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--text);font-size:12px;" onchange="filterDraftPlayers()">
+              <option value="pts">Trier: Points</option>
+              <option value="name">Trier: Nom A-Z</option>
+              <option value="team">Trier: Équipe</option>
+            </select>
+          </div>
+          <div id="draftPickForBar" style="display:none;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--gold);display:flex;align-items:center;justify-content:space-between;">
+            <span>🎯 Mode admin — tu picks pour: <strong id="draftPickForName">—</strong></span>
+            <button class="ab" style="font-size:11px;" onclick="cancelPickFor()">✕ Annuler</button>
           </div>
           <div id="draftMyTurn" class="hidden" style="background:rgba(200,16,46,0.1);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--accent2);">🏒 C'est ton tour de choisir!</div>
           <div id="draftLoadSection" style="display:none;margin-bottom:12px;">
@@ -1154,7 +1164,18 @@ window.clearTradeBadge = function(){ const badge = document.getElementById('trad
 function renderTrades(){
   const pend=trades.filter(t=>t.status==='pending');
   const hist=trades.filter(t=>t.status!=='pending');
-  document.getElementById('trp').innerHTML=pend.length?pend.map(t=>'<div class="tc"><div class="th2"><span style="font-size:11px;color:var(--text2)">'+(t.date||'')+'</span><span class="tbg p">En attente</span></div><div class="tf"><div class="ts"><div class="tdg2">'+t.from+' offre:</div><div class="tp">'+((t.give||[]).join(', '))+'</div></div><div class="ta2">⇄</div><div class="ts"><div class="tdg2">'+t.to+' offre:</div><div class="tp">'+((t.receive||[]).join(', '))+'</div></div></div><div class="tact"><button class="btn btn-a" onclick="accTrade(\''+t.fid+'\')">✓ Accepter</button><button class="btn btn-r" onclick="refTrade(\''+t.fid+'\')">✕ Refuser</button><button class="btn btn-c" onclick="notify(\'Contre-offre — bientôt!\')">↺ Contre-offre</button></div></div>').join(''):'<div class="empty">Aucun trade en attente</div>';
+  document.getElementById('trp').innerHTML=pend.length?pend.map(t=>{
+    const isSender=currentUser&&t.fromUid===currentUser.uid;
+    const isRecipient=currentUser&&t.toUid===currentUser.uid;
+    const actions=isRecipient
+      ? '<button class="btn btn-a" onclick="accTrade(\''+t.fid+'\')">✓ Accepter</button><button class="btn btn-r" onclick="refTrade(\''+t.fid+'\')">✕ Refuser</button><button class="btn btn-c" onclick="showCounterOffer(\''+t.fid+'\',\''+t.fromUid+'\')">↺ Contre-offre</button>'
+      : isSender
+        ? '<span style="font-size:11px;color:var(--text3);padding:4px 8px;">⏳ En attente de réponse...</span><button class="btn btn-r" onclick="refTrade(\''+t.fid+'\')">✕ Annuler</button>'
+        : isAdmin
+          ? '<button class="btn btn-a" onclick="accTrade(\''+t.fid+'\')">✓ Forcer acceptation</button><button class="btn btn-r" onclick="refTrade(\''+t.fid+'\')">✕ Annuler</button>'
+          : '';
+    return '<div class="tc"><div class="th2"><span style="font-size:11px;color:var(--text2)">'+(t.date||'')+'</span><span class="tbg p">En attente</span></div><div class="tf"><div class="ts"><div class="tdg2">'+t.from+' offre:</div><div class="tp">'+((t.give||[]).join(', '))+'</div></div><div class="ta2">⇄</div><div class="ts"><div class="tdg2">'+t.to+' offre:</div><div class="tp">'+((t.receive||[]).join(', '))+'</div></div></div><div class="tact">'+actions+'</div></div>';
+  }).join(''):'<div class="empty">Aucun trade en attente</div>';
   document.getElementById('trh').innerHTML=hist.length?hist.slice(0,8).map(t=>'<div class="tc"><div class="th2"><span style="font-size:11px;color:var(--text2)">'+(t.date||'')+'</span><span class="tbg '+(t.status==='accepted'?'a':'r')+'">'+(t.status==='accepted'?'Complété':'Refusé')+'</span></div><div class="tf"><div class="ts"><div class="tdg2">'+t.from+':</div><div class="tp">'+((t.give||[]).join(', '))+'</div></div><div class="ta2">⇄</div><div class="ts"><div class="tdg2">'+t.to+':</div><div class="tp">'+((t.receive||[]).join(', '))+'</div></div></div></div>').join(''):'<div class="empty">Aucun trade complété</div>';
   updateTradeBadge();
 }
@@ -1436,8 +1457,45 @@ function startTradesListener(){
 }
 
 window.accTrade=async function(fid){
-  try{await setDoc(doc(db,'trades',fid),{status:'accepted'},{merge:true});await logTx('Trade accepté');await loadTrades();renderTrades();notify('Trade accepté!');}
-  catch(e){notify('Erreur: '+e.message);}
+  try{
+    const tradeSnap = await getDoc(doc(db,'trades',fid));
+    if(!tradeSnap.exists()){notify('Trade introuvable');return;}
+    const trade = tradeSnap.data();
+    // Charger les deux rosters
+    const fromSnap = await getDoc(doc(db,'rosters',trade.fromUid));
+    const toSnap = await getDoc(doc(db,'rosters',trade.toUid));
+    const fromData = fromSnap.exists()?fromSnap.data():{actif:[],reserve:[]};
+    const toData = toSnap.exists()?toSnap.data():{actif:[],reserve:[]};
+    let fromActif=[...fromData.actif||[]]; let fromReserve=[...fromData.reserve||[]];
+    let toActif=[...toData.actif||[]]; let toReserve=[...toData.reserve||[]];
+    // Transférer les joueurs que FROM envoie → TO
+    for(const playerName of (trade.give||[])){
+      const inActif = fromActif.findIndex(p=>p.name===playerName);
+      const inReserve = fromReserve.findIndex(p=>p.name===playerName);
+      if(inActif!==-1){ const p=fromActif.splice(inActif,1)[0]; toReserve.push({...p,status:'reserve'}); }
+      else if(inReserve!==-1){ const p=fromReserve.splice(inReserve,1)[0]; toReserve.push({...p,status:'reserve'}); }
+    }
+    // Transférer les joueurs que TO envoie → FROM
+    for(const playerName of (trade.receive||[])){
+      const inActif = toActif.findIndex(p=>p.name===playerName);
+      const inReserve = toReserve.findIndex(p=>p.name===playerName);
+      if(inActif!==-1){ const p=toActif.splice(inActif,1)[0]; fromReserve.push({...p,status:'reserve'}); }
+      else if(inReserve!==-1){ const p=toReserve.splice(inReserve,1)[0]; fromReserve.push({...p,status:'reserve'}); }
+    }
+    // Sauvegarder les deux rosters
+    await setDoc(doc(db,'rosters',trade.fromUid),{actif:fromActif,reserve:fromReserve,ts:serverTimestamp()});
+    await setDoc(doc(db,'rosters',trade.toUid),{actif:toActif,reserve:toReserve,ts:serverTimestamp()});
+    await setDoc(doc(db,'trades',fid),{status:'accepted'},{merge:true});
+    // Recharger mon roster si impliqué
+    if(currentUser&&(trade.fromUid===currentUser.uid||trade.toUid===currentUser.uid)){
+      await loadRoster(currentUser.uid); renderRoster(); updateStats();
+    }
+    await postSystemChat('✅ Trade complété: '+trade.from+' ⇄ '+trade.to+' ('+((trade.give||[]).concat(trade.receive||[])).join(', ')+')');
+    await logTx('Trade accepté: '+trade.from+' ⇄ '+trade.to);
+    await loadTrades(); renderTrades();
+    notify('Trade accepté — joueurs transférés!');
+  }
+  catch(e){notify('Erreur: '+e.message); console.error(e);}
 };
 window.refTrade=async function(fid){
   try{await setDoc(doc(db,'trades',fid),{status:'refused'},{merge:true});await loadTrades();renderTrades();notify('Trade refusé.');}
@@ -1827,7 +1885,16 @@ function updateDraftTurnUI(){
 function renderDraftPickList(){
   const picks=draftState.picks||[];const curr=draftState.currentPick;
   const visible=picks.slice(Math.max(0,curr-3),curr+10);const startIdx=Math.max(0,curr-3);
-  document.getElementById('draftPickList').innerHTML=visible.map((p,i)=>{const absIdx=startIdx+i;const cls=absIdx===curr?'current':p.selected?'done':currentUser&&p.uid===currentUser.uid?'mine':'';const numCls=absIdx===curr?'current':'';return '<div class="draft-pick-row '+cls+'"><div class="draft-pick-num '+numCls+'">'+p.pick+'</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:10px;color:var(--text3);">R'+p.round+' '+(p.selected?'→ '+p.selected:'')+'</div></div></div>';}).join('');
+  document.getElementById('draftPickList').innerHTML=visible.map((p,i)=>{
+    const absIdx=startIdx+i;
+    const cls=absIdx===curr?'current':p.selected?'done':currentUser&&p.uid===currentUser.uid?'mine':'';
+    const numCls=absIdx===curr?'current':'';
+    const isCurrentPick=absIdx===curr&&!p.selected;
+    const pickForBtn=isAdmin&&isCurrentPick&&p.uid!==currentUser?.uid
+      ? '<button class="ab" style="font-size:9px;padding:1px 5px;margin-top:2px;" onclick="pickForDG(\''+p.uid+'\',\''+p.name+'\')">🎯 Picker</button>'
+      : '';
+    return '<div class="draft-pick-row '+cls+'"><div class="draft-pick-num '+numCls+'">'+p.pick+'</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:10px;color:var(--text3);">R'+p.round+' '+(p.selected?'→ '+p.selected:'')+' '+pickForBtn+'</div></div></div>';
+  }).join('');
 }
 
 const POS_LIMITS={forwards:16,defense:10,goalies:4};
@@ -1843,7 +1910,9 @@ function isPositionMaxed(pos){const counts=getMyDraftCounts();if(pos='G')return 
 function renderDraftPlayers(){
   const search=(document.getElementById('draftSearch')?.value||'').toLowerCase();
   const pos=document.getElementById('draftPosFilter')?.value||'';
-  const isMyTurn=currentUser&&draftState&&draftState.picks[draftState.currentPick]?.uid===currentUser.uid;
+  const currentPickUid = draftState?.picks[draftState?.currentPick]?.uid;
+  const isMyTurn=(currentUser&&currentPickUid===currentUser.uid) || (isAdmin&&pickForUid&&currentPickUid===pickForUid);
+  const effectiveUid = pickForUid && isAdmin ? pickForUid : currentUser?.uid;
   if(!nhlPlayersLoaded){
     const ls=document.getElementById('draftLoadSection');if(ls)ls.style.display='block';
     document.getElementById('draftPlayerList').innerHTML='<div class="empty" style="padding:30px;"><div style="font-size:13px;color:var(--text2);">⏳ Chargement des joueurs LNH en cours...</div></div>';
@@ -1854,7 +1923,13 @@ function renderDraftPlayers(){
     const matchSearch=p.name.toLowerCase().includes(search)||(p.team||'').toLowerCase().includes(search);
     const matchPos=!pos||p.pos===pos;
     return matchSearch&&matchPos;
-  }).sort((a,b)=>(b.seasonPts||0)-(a.seasonPts||0));
+  });
+  const sortBy = document.getElementById('draftSortBy')?.value || 'pts';
+  filtered.sort((a,b)=>{
+    if(sortBy==='name') return a.name.localeCompare(b.name);
+    if(sortBy==='team') return (a.team||'').localeCompare(b.team||'');
+    return (b.seasonPts||0)-(a.seasonPts||0);
+  });
   const counts=getMyDraftCounts();
   const posBar='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.forwards>=POS_LIMITS.forwards?'rgba(239,68,68,0.2)':'rgba(245,158,11,0.1)')+';color:'+(counts.forwards>=POS_LIMITS.forwards?'var(--red)':'var(--text2)')+';">ATT: '+counts.forwards+'/'+POS_LIMITS.forwards+'</span><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.defense>=POS_LIMITS.defense?'rgba(239,68,68,0.2)':'rgba(139,92,246,0.1)')+';color:'+(counts.defense>=POS_LIMITS.defense?'var(--red)':'var(--text2)')+';">DEF: '+counts.defense+'/'+POS_LIMITS.defense+'</span><span style="font-size:11px;padding:3px 8px;border-radius:5px;background:'+(counts.goalies>=POS_LIMITS.goalies?'rgba(239,68,68,0.2)':'rgba(200,16,46,0.1)')+';color:'+(counts.goalies>=POS_LIMITS.goalies?'var(--red)':'var(--text2)')+';">GOAL: '+counts.goalies+'/'+POS_LIMITS.goalies+'</span><span style="font-size:11px;color:var(--text3);padding:3px 0;">'+NHL_PLAYERS.length+' joueurs • '+filtered.length+' affichés</span></div>';
   const listHtml=filtered.slice(0,150).map(p=>{
@@ -1871,10 +1946,39 @@ function renderDraftPlayers(){
 }
 window.filterDraftPlayers=function(){renderDraftPlayers();};
 
+// Pick pour un DG absent (admin)
+let pickForUid = null;
+window.pickForDG = function(uid, name){
+  pickForUid = uid;
+  const bar = document.getElementById('draftPickForBar');
+  if(bar){ bar.style.display='flex'; document.getElementById('draftPickForName').textContent=name; }
+  renderDraftPlayers();
+};
+window.cancelPickFor = function(){
+  pickForUid = null;
+  const bar = document.getElementById('draftPickForBar');
+  if(bar) bar.style.display='none';
+  renderDraftPlayers();
+};
+
+// Contre-offre
+window.showCounterOffer = async function(fid, otherUid){
+  // Charger le trade original
+  const snap = await getDoc(doc(db,'trades',fid));
+  if(!snap.exists()) return;
+  const original = snap.data();
+  // Ouvrir le modal trade avec ce DG pré-sélectionné et le trade original comme base
+  showTradeModal();
+  await selectTradeDG(original.fromUid);
+  // Pré-sélectionner les joueurs du trade original (inversé)
+  notify('Modifie l\'offre et clique Envoyer pour proposer une contre-offre');
+};
+
 window.pickPlayer=async function(playerName){
   if(!currentUser||!draftState)return;
   const curr=draftState.picks[draftState.currentPick];
-  if(!curr||curr.uid!==currentUser.uid){notify('Ce n\'est pas ton tour');return;}
+  const allowedUid = (isAdmin&&pickForUid) ? pickForUid : currentUser.uid;
+  if(!curr||curr.uid!==allowedUid){notify('Ce n\'est pas ton tour');return;}
   const player=NHL_PLAYERS.find(p=>p.name===playerName);
   if(!player||draftedPlayers[playerName]){notify('Joueur non disponible');return;}
   if(isPositionMaxed(player.pos)){const posName=player.pos==='G'?'gardiens':player.pos==='D'?'défenseurs':'attaquants';notify('Maximum de '+posName+' atteint!');return;}
@@ -1883,13 +1987,16 @@ window.pickPlayer=async function(playerName){
   draftState.currentPick++;
   draftState.drafted=draftedPlayers;
   try{
-    const rSnap=await getDoc(doc(db,'rosters',currentUser.uid));
+    const targetUid = curr.uid; // Toujours le vrai DG du pick, pas l'admin
+    const rSnap=await getDoc(doc(db,'rosters',targetUid));
     const rData=rSnap.exists()?rSnap.data():{actif:[],reserve:[]};
     const newPlayer={num:0,name:player.name,team:player.team,pos:player.pos,status:'active',todayPts:0,seasonPts:0};
     const actif=rData.actif||[];const reserve=rData.reserve||[];
     if(actif.length<20)actif.push(newPlayer);else reserve.push({...newPlayer,status:'reserve'});
-    await setDoc(doc(db,'rosters',currentUser.uid),{actif,reserve,ts:serverTimestamp()});
-    ra=actif;rr=reserve;renderRoster();updateStats();
+    await setDoc(doc(db,'rosters',targetUid),{actif,reserve,ts:serverTimestamp()});
+    if(targetUid===currentUser.uid){ra=actif;rr=reserve;renderRoster();updateStats();}
+    // Reset pickFor après avoir pické
+    if(pickForUid){pickForUid=null;const bar=document.getElementById('draftPickForBar');if(bar)bar.style.display='none';}
     await setDoc(doc(db,'draft','current'),draftState);
     stopDraftTimer();if(draftState.timerSec>0)startDraftTimer();
     renderDraftPickList();renderDraftPlayers();updateDraftTurnUI();
