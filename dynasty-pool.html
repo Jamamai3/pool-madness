@@ -1384,6 +1384,7 @@
         const confirmed = regs.filter(d => d.status === 'confirmed');
         const waitlist = regs.filter(d => d.status === 'waitlist');
         const myReg = regs.find(d => d.userId === currentUser.uid && d.status !== 'cancelled');
+const wasCharged = regs.some(d => d.userId === currentUser.uid && d.charged === true);
 
         const filledPct = Math.min(100, (confirmed.length / s.maxPlayers) * 100);
         const isFull = confirmed.length >= s.maxPlayers;
@@ -1442,7 +1443,7 @@
             </div>
           ` : ''}
           ${s.notes ? `<div style="margin-top:0.75rem;font-size:0.85rem;color:var(--muted);padding-top:0.75rem;border-top:1px solid var(--border)">${s.notes}</div>` : ''}
-          ${isOpen ? renderSessionActions(sId, s, myReg ? {id: myReg._id, data: () => myReg} : null, isFull, amConfirmed, amWaitlist) : ''}
+          ${isOpen ? renderSessionActions(sId, s, myReg ? {id: myReg._id, data: () => myReg} : null, isFull, amConfirmed, amWaitlist, wasCharged) : ''}
         `;
         container.appendChild(div);
       }
@@ -1474,17 +1475,17 @@
     });
   };
 
-  function renderSessionActions(sId, s, myReg, isFull, amConfirmed, amWaitlist) {
+  function renderSessionActions(sId, s, myReg, isFull, amConfirmed, amWaitlist, wasCharged) {
     if (!myReg) {
       const label = isFull ? "S'inscrire (liste d'attente)" : "S'inscrire";
       const btnClass = isFull ? 'btn-ghost' : 'btn-primary';
-      const balanceOk = (currentUserData?.balance || 0) >= s.cost;
+      const balanceOk = (currentUserData?.balance || 0) >= s.cost || wasCharged;
       const showWarning = !balanceOk && s.cost > 0;
       return `
         <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
           ${showWarning ? `<span style="font-size:0.8rem;color:var(--red)">⚠ Solde insuffisant</span>` : ''}
           <button class="btn ${btnClass} btn-sm" onclick="registerForSession('${sId}', ${s.cost})" ${!balanceOk && s.cost > 0 ? 'disabled' : ''}>
-            ${label}
+            ${wasCharged ? '↩ Me réinscrire' : label}
           </button>
         </div>
       `;
