@@ -1288,8 +1288,7 @@
       updateNavBalance(currentUserData.balance);
       loadSessions();
       loadProfile();
-      // Auto-compléter les sessions passées
-autoCompletePastSessions();
+      autoCompletePastSessions();
 
     } else {
       document.getElementById('login-screen').style.display = 'flex';
@@ -1338,20 +1337,22 @@ autoCompletePastSessions();
     return d.toLocaleDateString('fr-CA', { day:'numeric', month:'short', year:'numeric' });
   }
 
+  // ===== AUTO-COMPLETE SESSIONS PASSÉES =====
   async function autoCompletePastSessions() {
-  const now = new Date();
-  const snap = await getDocs(query(
-    collection(db, 'sessions'),
-    where('status', 'in', ['open', 'closed'])
-  ));
-  for (const d of snap.docs) {
-    const s = d.data();
-    const sessionDate = s.date?.toDate?.();
-    if (sessionDate && sessionDate < now) {
-      await updateDoc(doc(db, 'sessions', d.id), { status: 'completed' });
+    const now = new Date();
+    const snap = await getDocs(query(
+      collection(db, 'sessions'),
+      where('status', 'in', ['open', 'closed'])
+    ));
+    for (const d of snap.docs) {
+      const s = d.data();
+      const sessionDate = s.date?.toDate?.();
+      if (sessionDate && sessionDate < now) {
+        await updateDoc(doc(db, 'sessions', d.id), { status: 'completed' });
+      }
     }
   }
-}
+
   // ===== SESSIONS VIEW =====
   // ===== SESSIONS TEMPS RÉEL =====
   let sessionsUnsubscribe = null;
