@@ -1384,7 +1384,7 @@
         const confirmed = regs.filter(d => d.status === 'confirmed');
         const waitlist = regs.filter(d => d.status === 'waitlist');
         const myReg = regs.find(d => d.userId === currentUser.uid && d.status !== 'cancelled');
-const wasCharged = regs.some(d => d.userId === currentUser.uid && d.charged === true);
+        const wasCharged = regs.some(d => d.userId === currentUser.uid && d.charged === true);
 
         const filledPct = Math.min(100, (confirmed.length / s.maxPlayers) * 100);
         const isFull = confirmed.length >= s.maxPlayers;
@@ -1477,7 +1477,7 @@ const wasCharged = regs.some(d => d.userId === currentUser.uid && d.charged === 
 
   function renderSessionActions(sId, s, myReg, isFull, amConfirmed, amWaitlist, wasCharged) {
     if (!myReg) {
-      const label = isFull ? "S'inscrire (liste d'attente)" : "S'inscrire";
+      const label = isFull ? "S'inscrire (liste d'attente)" : (wasCharged ? '↩ Me réinscrire' : "S'inscrire");
       const btnClass = isFull ? 'btn-ghost' : 'btn-primary';
       const balanceOk = (currentUserData?.balance || 0) >= s.cost || wasCharged;
       const showWarning = !balanceOk && s.cost > 0;
@@ -1485,7 +1485,7 @@ const wasCharged = regs.some(d => d.userId === currentUser.uid && d.charged === 
         <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border);display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center">
           ${showWarning ? `<span style="font-size:0.8rem;color:var(--red)">⚠ Solde insuffisant</span>` : ''}
           <button class="btn ${btnClass} btn-sm" onclick="registerForSession('${sId}', ${s.cost})" ${!balanceOk && s.cost > 0 ? 'disabled' : ''}>
-            ${wasCharged ? '↩ Me réinscrire' : label}
+            ${label}
           </button>
         </div>
       `;
@@ -1519,16 +1519,8 @@ const wasCharged = regs.some(d => d.userId === currentUser.uid && d.charged === 
     const userSnap = await getDoc(doc(db, 'users', currentUser.uid));
     const userData = userSnap.data();
     if (cost > 0 && userData.balance < cost) {
-      const prevSnap = await getDocs(query(
-        collection(db, 'registrations'),
-        where('sessionId', '==', sessionId),
-        where('userId', '==', currentUser.uid)
-      ));
-      const alreadyPaid = prevSnap.docs.some(d => d.data().charged === true);
-      if (!alreadyPaid) {
-        toast('Solde insuffisant pour cette session.', 'error');
-        return;
-      }
+      toast('Solde insuffisant pour cette session.', 'error');
+      return;
     }
 
     try {
