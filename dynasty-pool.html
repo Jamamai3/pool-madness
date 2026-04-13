@@ -1518,8 +1518,16 @@
     const userSnap = await getDoc(doc(db, 'users', currentUser.uid));
     const userData = userSnap.data();
     if (cost > 0 && userData.balance < cost) {
-      toast('Solde insuffisant pour cette session.', 'error');
-      return;
+      const prevSnap = await getDocs(query(
+        collection(db, 'registrations'),
+        where('sessionId', '==', sessionId),
+        where('userId', '==', currentUser.uid)
+      ));
+      const alreadyPaid = prevSnap.docs.some(d => d.data().charged === true);
+      if (!alreadyPaid) {
+        toast('Solde insuffisant pour cette session.', 'error');
+        return;
+      }
     }
 
     try {
