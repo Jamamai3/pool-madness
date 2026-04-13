@@ -319,6 +319,8 @@
     .session-card.upcoming::before { background: var(--amber); }
     .session-card.closed::before { background: var(--muted); }
     .session-card.completed::before { background: var(--surface3); }
+    .session-card.cancelled::before { background: var(--red); }
+    .session-card.cancelled { border-color: var(--red-dark); opacity: 0.8; }
 
     .session-card:hover { border-color: var(--muted); }
 
@@ -359,6 +361,7 @@
     .tag-status-upcoming { background: rgba(245,158,11,0.15); color: var(--amber); }
     .tag-status-closed { background: var(--surface3); color: var(--muted); }
     .tag-status-completed { background: var(--surface3); color: var(--muted); }
+    .tag-status-cancelled { background: rgba(215,43,43,0.15); color: var(--red); }
     .tag-cost { background: var(--surface3); color: var(--text); }
     .tag-location { background: var(--surface3); color: var(--text); }
     .tag-waitlist { background: rgba(245,158,11,0.15); color: var(--amber); }
@@ -1153,7 +1156,7 @@
     createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
   import {
-    getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc,
+    getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
     query, where, orderBy, onSnapshot, serverTimestamp, increment, runTransaction,
     Timestamp, limit
   } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
@@ -1350,9 +1353,10 @@
     const filterVal = document.getElementById('sessions-filter').value;
     let q;
     if (filterVal === 'upcoming') {
-      q = query(collection(db, 'sessions'), where('status', 'in', ['upcoming','open']), orderBy('date'));
+      // "À venir" = upcoming + open + closed (pas encore passées)
+      q = query(collection(db, 'sessions'), where('status', 'in', ['upcoming','open','closed']), orderBy('date'));
     } else if (filterVal === 'completed') {
-      q = query(collection(db, 'sessions'), where('status', '==', 'completed'), orderBy('date', 'desc'));
+      q = query(collection(db, 'sessions'), where('status', 'in', ['completed','cancelled']), orderBy('date', 'desc'));
     } else {
       q = query(collection(db, 'sessions'), orderBy('date', 'desc'));
     }
@@ -1392,10 +1396,12 @@
         const amConfirmed = myReg && myReg.status === 'confirmed';
         const amWaitlist = myReg && myReg.status === 'waitlist';
 
-        const statusLabels = { open: 'Inscriptions ouvertes', upcoming: 'Bientôt', closed: 'Fermé', completed: 'Terminé' };
+        const statusLabels = { open: 'Inscriptions ouvertes', upcoming: 'Bientôt', closed: 'Fermé', completed: 'Terminé', cancelled: '❌ Annulée' };
 
         const div = document.createElement('div');
         div.className = `session-card ${s.status}`;
+        if (s.status === 'cancelled') div.style.borderColor = 'var(--red-dark)';
+        if (s.status === 'closed') div.style.cssText += '; border-left-color: var(--muted)';
         div.innerHTML = `
           <div class="session-header">
             <div>
@@ -1622,21 +1628,41 @@
 
   // ===== ANNULATION =====
   window.cancelRegistration = (regId, sessionId, cost) => {
-    const sessionClosedMsg = cost > 0 
-      ? 'Si la session est fermée, aucun remboursement automatique — l\'admin peut accorder un crédit si un remplaçant est trouvé.'
-      : '';
-    confirm('Annuler ton inscription?', sessionClosedMsg, async () => {
+    confirm('Annuler ton inscription?', 'Si les inscriptions sont encore ouvertes, tu seras remboursé automatiquement.', async () => {
       try {
+        const regSnap = await getDoc(doc(db, 'registrations', regId));
+        const regData = regSnap.data();
+        const sessionSnap = await getDoc(doc(db, 'sessions', sessionId));
+        const sessionData = sessionSnap.data();
+
         await updateDoc(doc(db, 'registrations', regId), {
           status: 'cancelled',
           cancelledAt: serverTimestamp()
         });
+
+        // Remboursement automatique si session encore ouverte et joueur avait payé
+        if (regData.charged && sessionData.cost > 0 && sessionData.status === 'open') {
+          await runTransaction(db, async (tx) => {
+            tx.update(doc(db, 'users', currentUser.uid), { balance: increment(sessionData.cost) });
+            const txRef = doc(collection(db, 'transactions'));
+            tx.set(txRef, {
+              userId: currentUser.uid,
+              sessionId,
+              type: 'credit',
+              amount: sessionData.cost,
+              description: `Remboursement annulation: ${sessionData.title}`,
+              createdAt: serverTimestamp(),
+              createdBy: 'system'
+            });
+          });
+          toast(`Inscription annulée — ${sessionData.cost}$ remboursé. `, 'success');
+        } else {
+          toast('Inscription annulée.', 'success');
+        }
+
         await promoteWaitlist(sessionId);
-        // Refresh solde et sessions
         currentUserData = (await getDoc(doc(db, 'users', currentUser.uid))).data();
         updateNavBalance(currentUserData.balance);
-        toast('Inscription annulée.', 'success');
-        await loadSessions();
       } catch(e) {
         toast(e.message, 'error');
       }
@@ -1768,44 +1794,59 @@
     loadAdminSessions();
   };
 
+  let adminSessionsUnsubscribe = null;
+
   async function loadAdminSessions() {
     const container = document.getElementById('admin-sessions-list');
     container.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
-    
-    const snap = await getDocs(query(collection(db, 'sessions'), orderBy('date', 'desc')));
-    if (snap.empty) {
-      container.innerHTML = '<div class="empty">Aucune session créée.</div>';
-      return;
-    }
-    container.innerHTML = '';
-    for (const d of snap.docs) {
-      const s = d.data();
-      const regSnap = await getDocs(query(collection(db, 'registrations'), where('sessionId', '==', d.id)));
-      const confirmed = regSnap.docs.filter(r => r.data().status === 'confirmed').length;
-      const waitlist = regSnap.docs.filter(r => r.data().status === 'waitlist').length;
-      
-      const div = document.createElement('div');
-      div.className = 'card';
-      div.innerHTML = `
-        <div class="card-header">
-          <div>
-            <div style="font-family:var(--font-display);font-weight:700;font-size:1.1rem">${s.title}</div>
-            <div style="font-size:0.82rem;color:var(--muted)">${formatDate(s.date)} — ${s.location}</div>
+
+    if (adminSessionsUnsubscribe) adminSessionsUnsubscribe();
+
+    const q = query(collection(db, 'sessions'), orderBy('date', 'desc'));
+
+    adminSessionsUnsubscribe = onSnapshot(q, async (snap) => {
+      if (snap.empty) {
+        container.innerHTML = '<div class="empty">Aucune session créée.</div>';
+        return;
+      }
+      container.innerHTML = '';
+      for (const d of snap.docs) {
+        const s = d.data();
+        const regSnap = await getDocs(query(collection(db, 'registrations'), where('sessionId', '==', d.id)));
+        const confirmed = regSnap.docs.filter(r => r.data().status === 'confirmed').length;
+        const waitlist = regSnap.docs.filter(r => r.data().status === 'waitlist').length;
+
+        const statusLabels = { upcoming: 'Bientôt', open: 'Ouvert', closed: 'Fermé', completed: 'Terminé', cancelled: '❌ Annulée' };
+        const isCancelled = s.status === 'cancelled';
+
+        const div = document.createElement('div');
+        div.className = 'card';
+        if (isCancelled) div.style.borderColor = 'var(--red-dark)';
+        div.innerHTML = `
+          <div class="card-header">
+            <div>
+              <div style="font-family:var(--font-display);font-weight:700;font-size:1.1rem">${s.title}</div>
+              <div style="font-size:0.82rem;color:var(--muted)">${formatDate(s.date)} — ${s.location}</div>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+              <span class="tag tag-status-${s.status}">${statusLabels[s.status] || s.status}</span>
+              <span class="tag tag-cost">${confirmed}/${s.maxPlayers} 🟢 ${waitlist > 0 ? waitlist + ' ⏳' : ''}</span>
+            </div>
           </div>
-          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
-            <span class="tag tag-status-${s.status}">${s.status}</span>
-            <span class="tag tag-cost">${confirmed}/${s.maxPlayers} 🟢 ${waitlist > 0 ? waitlist + ' ⏳' : ''}</span>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+            ${!isCancelled ? `
+              <button class="btn btn-secondary btn-sm" onclick="openSessionModal('${d.id}')">Modifier</button>
+              <button class="btn btn-sm btn-secondary" onclick="changeSessionStatus('${d.id}', '${s.status}')">Statut</button>
+              <button class="btn btn-success btn-sm" onclick="chargeSession('${d.id}')">Débiter joueurs</button>
+              <button class="btn btn-primary btn-sm" onclick="openManageRegistrationsModal('${d.id}', '${s.title.replace(/'/g,"\\'")}')">👥 Inscriptions</button>
+              <button class="btn btn-danger btn-sm" onclick="cancelSession('${d.id}', '${s.title.replace(/'/g,"\\'")}')">❌ Annuler session</button>
+            ` : ''}
+            <button class="btn btn-ghost btn-sm" onclick="deleteSession('${d.id}', '${s.title.replace(/'/g,"\\'")}')">🗑 Supprimer</button>
           </div>
-        </div>
-        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-          <button class="btn btn-secondary btn-sm" onclick="openSessionModal('${d.id}')">Modifier</button>
-          <button class="btn btn-sm btn-secondary" onclick="changeSessionStatus('${d.id}', '${s.status}')">Statut</button>
-          <button class="btn btn-success btn-sm" onclick="chargeSession('${d.id}')">Débiter joueurs</button>
-          <button class="btn btn-primary btn-sm" onclick="openManageRegistrationsModal('${d.id}', '${s.title.replace(/'/g,"\\'")}')">👥 Inscriptions</button>
-        </div>
-      `;
-      container.appendChild(div);
-    }
+        `;
+        container.appendChild(div);
+      }
+    });
   }
 
   async function loadAdminUsers() {
@@ -1912,6 +1953,61 @@
       await updateDoc(doc(db, 'sessions', sessionId), { status: next });
       toast(`Statut changé: ${next}`, 'success');
       loadAdminSessions();
+    });
+  };
+
+  window.cancelSession = (sessionId, sessionTitle) => {
+    confirm(`Annuler la session "${sessionTitle}"?`, 'Tous les joueurs inscrits seront remboursés automatiquement.', async () => {
+      const sessionSnap = await getDoc(doc(db, 'sessions', sessionId));
+      const s = sessionSnap.data();
+
+      // Rembourser tous les joueurs confirmés qui ont payé
+      const regSnap = await getDocs(query(
+        collection(db, 'registrations'),
+        where('sessionId', '==', sessionId),
+        where('status', '==', 'confirmed'),
+        where('charged', '==', true)
+      ));
+
+      for (const regDoc of regSnap.docs) {
+        const r = regDoc.data();
+        await runTransaction(db, async (tx) => {
+          tx.update(doc(db, 'users', r.userId), { balance: increment(s.cost) });
+          tx.update(regDoc.ref, { status: 'cancelled', cancelledAt: serverTimestamp() });
+          const txRef = doc(collection(db, 'transactions'));
+          tx.set(txRef, {
+            userId: r.userId, sessionId,
+            type: 'credit', amount: s.cost,
+            description: `Remboursement — session annulée: ${s.title}`,
+            createdAt: serverTimestamp(), createdBy: currentUser.uid
+          });
+        });
+      }
+
+      // Annuler aussi les inscriptions non payées et liste d'attente
+      const otherRegSnap = await getDocs(query(
+        collection(db, 'registrations'),
+        where('sessionId', '==', sessionId),
+        where('status', 'in', ['confirmed', 'waitlist'])
+      ));
+      for (const regDoc of otherRegSnap.docs) {
+        await updateDoc(regDoc.ref, { status: 'cancelled', cancelledAt: serverTimestamp() });
+      }
+
+      await updateDoc(doc(db, 'sessions', sessionId), { status: 'cancelled' });
+      toast(`Session annulée — ${regSnap.size} joueur(s) remboursé(s).`, 'success');
+      loadAdminSessions();
+    });
+  };
+
+  window.deleteSession = (sessionId, sessionTitle) => {
+    confirm(`Supprimer définitivement "${sessionTitle}"?`, '⚠️ Cette action est irréversible. Les inscriptions associées seront aussi supprimées.', async () => {
+      const regSnap = await getDocs(query(collection(db, 'registrations'), where('sessionId', '==', sessionId)));
+      for (const regDoc of regSnap.docs) {
+        await deleteDoc(regDoc.ref);
+      }
+      await deleteDoc(doc(db, 'sessions', sessionId));
+      toast('Session supprimée.', 'success');
     });
   };
 
